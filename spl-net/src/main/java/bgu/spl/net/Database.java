@@ -17,8 +17,8 @@ import java.util.Vector;
  */
 public class Database {
 
-    Vector<Course> allCourses = new Vector<Course>();
-    Vector<User> allUsers = new Vector<User>();
+    private Vector<Course> allCourses;
+    private Vector<User> allUsers;
 
     private static class DataHolder {
         private static Database instance = new Database();
@@ -26,7 +26,8 @@ public class Database {
 
     //to prevent user from creating new Database
     private Database() {
-        // TODO: implement
+        allCourses = new Vector<>();
+        allUsers = new Vector<>();
     }
 
     /**
