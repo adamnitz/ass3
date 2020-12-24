@@ -17,11 +17,11 @@ import java.util.Vector;
  */
 public class Database {
 
-    private Vector<Course> allCourses;
-    private Vector<User> allUsers;
+    private final Vector<Course> allCourses;
+    private final Vector<User> allUsers;
 
     private static class DataHolder {
-        private static Database instance = new Database();
+        private static final Database instance = new Database();
     }
 
     //to prevent user from creating new Database
