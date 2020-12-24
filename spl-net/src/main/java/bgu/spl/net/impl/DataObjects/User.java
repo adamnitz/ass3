@@ -6,11 +6,13 @@ public abstract class User {
 
     private String userName;
     private String password;
+    private boolean isLogIn;
 
     public User(String userName, String password)
     {
         this.userName = userName;
         this.password = password;
+        this.isLogIn = false;
     }
 
     public String getUserName() {
@@ -21,4 +23,11 @@ public abstract class User {
         return password;
     }
 
+    public boolean isLogIn() {
+        return isLogIn;
+    }
+
+    public void setLogIn(boolean logIn) {
+        isLogIn = logIn;
+    }
 }
