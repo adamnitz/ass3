@@ -131,7 +131,6 @@ public class Database {
             Student admin = new Student(userName,password);
             allUsers.add(admin);
         }
-
     }
 
     public void logIn(String userName, String password)
@@ -158,6 +157,8 @@ public class Database {
             //TODO:SEND ERROR MESSAGE
         }
     }
+
+
 
 
 }
