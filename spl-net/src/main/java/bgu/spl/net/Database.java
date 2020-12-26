@@ -1,7 +1,9 @@
 package bgu.spl.net;
 
 
+import bgu.spl.net.impl.DataObjects.Admin;
 import bgu.spl.net.impl.DataObjects.Course;
+import bgu.spl.net.impl.DataObjects.Student;
 import bgu.spl.net.impl.DataObjects.User;
 
 import javax.xml.crypto.Data;
@@ -89,6 +91,72 @@ public class Database {
         }
 
      return true;
+    }
+
+    public void adminReg(String userName, String password)
+    {
+        boolean isExist = false;
+        //TODO:think if it's work because of the instanceOf
+        for (int i=0; i<allUsers.size()&& !isExist; i++) {
+            if(allUsers.get(i) instanceof Admin)
+            {
+                if(allUsers.get(i).getUserName().equals(userName))
+                    isExist=true;
+            }
+        }
+        if(isExist) {
+           //TODO:SEND ERROR MESSAGE
+        }
+        else{
+            Student admin = new Student(userName,password);
+            allUsers.add(admin);
+        }
+    }
+
+    public void studentReg(String userName, String password)
+    {
+        boolean isExist = false;
+        //TODO:think if it's work because of the instanceOf
+        for (int i=0; i<allUsers.size()&& !isExist; i++) {
+            if(allUsers.get(i) instanceof Admin)
+            {
+                if(allUsers.get(i).getUserName().equals(userName))
+                    isExist=true;
+            }
+        }
+        if(isExist) {
+            //TODO:SEND ERROR MESSAGE
+        }
+        else{
+            Student admin = new Student(userName,password);
+            allUsers.add(admin);
+        }
+
+    }
+
+    public void logIn(String userName, String password)
+    {
+        boolean isExist = false;
+        boolean notThePass = false;
+        //TODO:think if it's work because of the instanceOf
+        for (int i=0; i<allUsers.size()&& !isExist && !notThePass; i++) {
+            if(allUsers.get(i).getUserName().equals(userName))
+            {
+                isExist=true;
+                if(!allUsers.get(i).getPassword().equals(password)) {
+                    notThePass = true;
+                }
+                else{
+                    allUsers.get(i).setLogIn(true);
+                }
+            }
+
+        }
+
+        if(!isExist | notThePass)
+        {
+            //TODO:SEND ERROR MESSAGE
+        }
     }
 
 
