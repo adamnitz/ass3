@@ -5,7 +5,12 @@ import bgu.spl.net.impl.DataObjects.Course;
 import bgu.spl.net.impl.DataObjects.User;
 
 import javax.xml.crypto.Data;
+import java.io.*;
+import java.nio.Buffer;
+import java.util.LinkedList;
+import java.util.Scanner;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 /**
  * Passive object representing the Database where all courses and users are stored.
@@ -43,7 +48,47 @@ public class Database {
      */
     boolean initialize(String coursesFilePath) {
         // TODO: implement
-        return false;
+
+        FileReader file = null;//TODO:in main ill give to the initialize the courses.txt
+        try {
+            file = new FileReader(coursesFilePath);
+        } catch (FileNotFoundException e) {
+            System.out.print("The File not found");
+        }
+
+        BufferedReader in = new BufferedReader(file);
+        String line = null;
+        try {
+            line = in.readLine();
+        } catch (IOException e) {
+            return false;
+        }
+
+        while(line != null)
+        {
+            String[] lineArr = line.split("|");
+            int courseNum = Integer.parseInt(lineArr[0]);
+            String courseName = lineArr[1];
+            LinkedList<Course> kdamCourseList = new LinkedList<Course>();
+            String[] kdamCourseArr= lineArr[3].split(",");
+            for(int i=0; i<kdamCourseArr.length; i++)
+            {
+                int kdamCourseNum = Integer.parseInt(kdamCourseArr[i]);
+                Course course = allCourses.get(kdamCourseNum);
+                kdamCourseList.add(course);
+                //TODO:check if it's possibbole that there is course that wasnt registered yet
+            }
+            int numOfMaxStudents = Integer.parseInt(lineArr[3]);
+            Course course = new Course(courseNum, courseName,kdamCourseList,numOfMaxStudents);
+            allCourses.add(course);
+            try {
+                line = in.readLine();
+            } catch (IOException e) {
+                return false;
+            }
+        }
+
+     return true;
     }
 
 
