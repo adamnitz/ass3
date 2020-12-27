@@ -8,8 +8,7 @@ public abstract class User {
     private String password;
     private boolean isLogIn;
 
-    public User(String userName, String password)
-    {
+    public User(String userName, String password){
         this.userName = userName;
         this.password = password;
         this.isLogIn = false;

@@ -66,15 +66,13 @@ public class Database {
             return false;
         }
 
-        while(line != null)
-        {
+        while(line != null) {
             String[] lineArr = line.split("|");
             int courseNum = Integer.parseInt(lineArr[0]);
             String courseName = lineArr[1];
             LinkedList<Course> kdamCourseList = new LinkedList<Course>();
             String[] kdamCourseArr= lineArr[3].split(",");
-            for(int i=0; i<kdamCourseArr.length; i++)
-            {
+            for(int i=0; i<kdamCourseArr.length; i++){
                 int kdamCourseNum = Integer.parseInt(kdamCourseArr[i]);
                 Course course = allCourses.get(kdamCourseNum);
                 kdamCourseList.add(course);
@@ -89,7 +87,6 @@ public class Database {
                 return false;
             }
         }
-
      return true;
     }
 
@@ -98,13 +95,12 @@ public class Database {
         boolean isExist = false;
         //TODO:think if it's work because of the instanceOf
         for (int i=0; i<allUsers.size()&& !isExist; i++) {
-            if(allUsers.get(i) instanceof Admin)
-            {
+            if(allUsers.get(i) instanceof Admin){
                 if(allUsers.get(i).getUserName().equals(userName))
                     isExist=true;
             }
         }
-        if(isExist) {
+        if(isExist){
            //TODO:SEND ERROR MESSAGE
         }
         else{
@@ -113,13 +109,11 @@ public class Database {
         }
     }
 
-    public void studentReg(String userName, String password)
-    {
+    public void studentReg(String userName, String password){
         boolean isExist = false;
         //TODO:think if it's work because of the instanceOf
-        for (int i=0; i<allUsers.size()&& !isExist; i++) {
-            if(allUsers.get(i) instanceof Admin)
-            {
+        for (int i=0; i<allUsers.size() && !isExist; i++) {
+            if(allUsers.get(i) instanceof Student){
                 if(allUsers.get(i).getUserName().equals(userName))
                     isExist=true;
             }
@@ -133,16 +127,16 @@ public class Database {
         }
     }
 
-    public void logIn(String userName, String password)
-    {
+
+    //todo:i think we should do it again .said nitzan.
+    public void logIn(String userName, String password){
         boolean isExist = false;
         boolean notThePass = false;
         //TODO:think if it's work because of the instanceOf
-        for (int i=0; i<allUsers.size()&& !isExist && !notThePass; i++) {
-            if(allUsers.get(i).getUserName().equals(userName))
-            {
-                isExist=true;
-                if(!allUsers.get(i).getPassword().equals(password)) {
+        for (int i=0; i<allUsers.size() && !isExist && !notThePass; i++){ //why we put here (!notthepass)
+            if(allUsers.get(i).getUserName().equals(userName)){
+                isExist=true;// if its exist, why we continue, we need to send error
+                if(!allUsers.get(i).getPassword().equals(password)){
                     notThePass = true;
                 }
                 else{
@@ -151,7 +145,6 @@ public class Database {
             }
 
         }
-
         if(!isExist | notThePass)
         {
             //TODO:SEND ERROR MESSAGE
