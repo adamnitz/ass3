@@ -1,5 +1,10 @@
 package bgu.spl.net.impl.DataObjects;
 
+import bgu.spl.net.impl.Message.Ack;
+import bgu.spl.net.impl.Message.Error;
+import bgu.spl.net.impl.Message.Message;
+
+import java.util.Comparator;
 import java.util.LinkedList;
 
 public class Course {
@@ -8,6 +13,7 @@ public class Course {
     private LinkedList<Course> kdamCourseList;
     private int numOfMaxStudent;
     private int numOfRegisteredStudent;
+    LinkedList<String> registeredStudent;
 
     public Course(int courseNum,String courseName,LinkedList<Course> kdamCourseList, int numOfMaxStudent){
         this.courseNum = courseNum;
@@ -15,6 +21,7 @@ public class Course {
         this.kdamCourseList = kdamCourseList;
         this.numOfMaxStudent = numOfMaxStudent;
         this.numOfRegisteredStudent = 0;
+        registeredStudent = new LinkedList<String>();
     }
 
     public int getCourseNum() {
@@ -37,23 +44,37 @@ public class Course {
         return numOfRegisteredStudent;
     }
 
-    public void addNumOfRegisteredStudent(){
+    public LinkedList<String> getRegisteredStudent() {
+        return registeredStudent;
+    }
+
+    public Message addNumOfRegisteredStudent(int opCode){
         if(numOfRegisteredStudent < numOfMaxStudent){
             numOfRegisteredStudent++;
         }
         else{
-            //TODO:SEND ERROR MESSAGE
+            return new Error(opCode);
         }
+        return new Ack(opCode);
+
+
     }
-    public void removeNumOfRegisteredStudent(){
+    public Message removeNumOfRegisteredStudent(int opCode){
         if(numOfRegisteredStudent>0){
             numOfRegisteredStudent--;
         }
 
         else{
-            //TODO:SEND ERROR MESSAGE
+            return new Error(opCode);
         }
-
+        return new Ack(opCode);
     }
+
+    public void addStudentToCourse(String name){
+        this.registeredStudent.add(name);
+        registeredStudent.sort(Comparator.naturalOrder());
+    }
+
+
 }
 

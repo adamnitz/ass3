@@ -7,15 +7,12 @@ import bgu.spl.net.impl.DataObjects.Student;
 import bgu.spl.net.impl.DataObjects.User;
 import bgu.spl.net.impl.Message.Error;
 import bgu.spl.net.impl.Message.Ack;
+import bgu.spl.net.impl.Message.Message;
 
 
-import javax.xml.crypto.Data;
 import java.io.*;
-import java.nio.Buffer;
 import java.util.LinkedList;
-import java.util.Scanner;
 import java.util.Vector;
-import java.util.stream.Stream;
 
 /**
  * Passive object representing the Database where all courses and users are stored.
@@ -93,7 +90,8 @@ public class Database {
         return true;
     }
 
-    public void adminReg(String userName, String password) {
+    public Message adminReg(String userName, String password) {
+        int opCode = 1;
         boolean isExist = false;
         //TODO:think if it's work because of the instanceOf
         for (int i = 0; i < allUsers.size() && !isExist; i++) {
@@ -103,136 +101,261 @@ public class Database {
             }
         }
         if (isExist) {
-           // return new Error(1);
-            // TODO:SEND ERROR MESSAGE
+            return new Error(opCode);
         } else {
             Student admin = new Student(userName, password);
             allUsers.add(admin);
+            return new Ack(opCode);
         }
     }
 
-    public void studentReg(String userName, String password) {
+    public User findUser(String userName) {
         boolean isExist = false;
-        //TODO:think if it's work because of the instanceOf
+        User user = null;
         for (int i = 0; i < allUsers.size() && !isExist; i++) {
             if (allUsers.get(i) instanceof Student) {
-                if (allUsers.get(i).getUserName().equals(userName))
+                user = allUsers.get(i);
+                if (user.getUserName().equals(userName))
                     isExist = true;
             }
         }
-        if (isExist) {
-            //TODO:SEND ERROR MESSAGE
-        } else {
-            Student admin = new Student(userName, password);
-            allUsers.add(admin);
-        }
+
+        return user;
     }
 
-
-    //todo:i think we should do it again .said nitzan.
-    public void logIn(String userName, String password) {
+    public Student findStudent(String userName) {
         boolean isExist = false;
-        //TODO:think if it's work because of the instanceOf
+        Student student = null;
         for (int i = 0; i < allUsers.size() && !isExist; i++) {
-            User user = allUsers.get(i);
-            if (user.getUserName().equals(userName)) {
-                isExist = true;
-                if (user.isLogIn()) {
-                    //TODO:SEND ERROR MESSAGE
-                }
-                if (!user.getPassword().equals(password)) {
-                    //TODO:SEND ERROR MESSAGE
-                }
-
+            if (allUsers.get(i) instanceof Student) {
+                student = (Student) allUsers.get(i);
+                if (student.getUserName().equals(userName))
+                    isExist = true;
             }
         }
-        if (!isExist) {
-            //TODO:SEND ERROR MESSAGE
-        }
+
+        return student;
     }
 
-    public void logOut(String userName) {
-        for (int i = 0; i < allUsers.size(); i++) { //why we put here (!notthepass)
-            User user = allUsers.get(i);
-            if (user.getUserName().equals(userName)) {
-                if (user.isLogIn()) {
-                    //TODO:SEND ERROR MESSAGE
-                } else {
-                    user.setLogIn(false);
-                }
-            }
-        }
-    }
-
-    public void courseReg(String userName, int courseNum) {
-
+    public Course findCourse(int courseNum) {
         boolean courseIsExist = false;
         Course course = null;
-        Student student = null;
         for (int i = 0; i < allCourses.size() && !courseIsExist; i++) {
             course = allCourses.get(i);
             if (course.equals(courseNum)) {
                 courseIsExist = true;
-                if (course.getNumOfRegisteredStudent() >= course.getNumOfMaxStudent()) {
-                    //TODO:SEND ERROR MESSAGE
-                }
-            }
-
-        }
-
-        if (!courseIsExist) {
-            //TODO:SEND ERROR MESSAGE
-        }
-
-
-        for (int i = 0; i < allUsers.size(); i++) { //why we put here (!notthepass)
-            if (allUsers.get(i).getUserName().equals(userName)) {
-                if (allUsers.get(i) instanceof Admin) {
-                    //TODO:SEND ERROR MESSAGE
-                }
-                if(allUsers.get(i) instanceof Student){
-                    student = (Student) allUsers.get(i);
-                }
-                if (!allUsers.get(i).isLogIn()) {
-                    //TODO:SEND ERROR MESSAGE
-                }
             }
         }
 
-      kdamCheck(student,course);
+        return course;
+    }
 
-        student.addCourse(course);
-        course.addNumOfRegisteredStudent();
-        //TODO::SEND ACK MESSAGE
+    public Message studentReg(String userName, String password) {
+        int opCode = 2;
+        boolean isExist = false;
+        //TODO:think if it's work because of the instanceOf
+
+        if (findStudent(userName) != null) {
+            return new Error(opCode);
+        } else {
+            Student admin = new Student(userName, password);
+            allUsers.add(admin);
+            return new Ack(opCode);
+        }
+    }
+
+
+    public Message logIn(String userName, String password) {
+        int opCode = 3;
+        User user = findUser(userName);
+
+        if (user == null | user.isLogIn()) {
+            return new Error(opCode);
+        } else if (!user.getPassword().equals(password)) {
+            return new Error(opCode);
+        }
+
+        user.setLogIn(true);
+        return new Ack(opCode);
 
     }
 
-    public void kdamCheck(Student student, Course course)
-    {
+    public Message logOut(String userName) {
+        int opCode = 4;
+
+        User user = findUser(userName);
+        if (user.getUserName().equals(userName)) {
+            if (user.isLogIn()) {
+                return new Error(opCode);
+            } else {
+                user.setLogIn(false);
+                return new Ack(opCode);
+            }
+        }
+
+        return new Error(opCode);
+
+    }
+
+    public Message courseReg(String userName, int courseNum) {
+        int opCode = 5;
+        Course course = findCourse(courseNum);
+        Student student = null;
+        if (course.equals(courseNum)) {
+            if (course.getNumOfRegisteredStudent() >= course.getNumOfMaxStudent()) {
+                return new Error(opCode);
+            }
+        }
+
+
+        if (course == null) {
+            return new Error(opCode);
+        }
+
+        for (int i = 0; i < allUsers.size(); i++) {
+            if (allUsers.get(i).getUserName().equals(userName)) {
+                if (allUsers.get(i) instanceof Admin) {
+                    return new Error(opCode);
+                }
+                if (allUsers.get(i) instanceof Student) {
+                    student = (Student) allUsers.get(i);
+                }
+                if (!allUsers.get(i).isLogIn()) {
+                    return new Error(opCode);
+                }
+            }
+        }
+
+        kdamCheck(student, courseNum);
+
+        student.addCourse(course);
+        course.addStudentToCourse(student.getUserName());
+        return course.addNumOfRegisteredStudent(opCode);
+
+
+    }
+
+    public Message kdamCheck(Student student, int courseNumber) {
+        int opCode = 6;
+        Course course = findCourse(courseNumber);
         LinkedList<Course> courseList = student.getCoursesList();
         LinkedList<Course> kdamCourseList = course.getKdamCourseList();
         boolean found = false;
-        boolean allKdamDone=true;
-        int i=0;
-        int j=0;
-        while( i<courseList.size()){
-            while( j<kdamCourseList.size() && !found && allKdamDone) {
-                boolean isEquals=courseList.get(i).equals(kdamCourseList.get(j));
+        boolean allKdamDone = true;
+        int i = 0;
+        int j = 0;
+        while (i < courseList.size()) {
+            while (j < kdamCourseList.size() && !found && allKdamDone) {
+                boolean isEquals = courseList.get(i).equals(kdamCourseList.get(j));
                 if (isEquals) {
                     found = true;
                     j++;
                 }
-                if(isEquals && (i==courseList.size()-1))
-                    allKdamDone=false;
+                if (isEquals && (i == courseList.size() - 1))
+                    allKdamDone = false;
 
                 i++;
             }
             found = false;
         }
         if (!allKdamDone) {
-            //TODO:SEND ERROR MESSAGE
+            return new Error(opCode);
         }
+        return new Ack(opCode);
     }
 
+    public String courseStat(int courseNumber) {
+        Course course = findCourse(courseNumber);
+        int courseNum = course.getCourseNum();
+        String courseName = course.getCourseName();
+        int availableSeats = course.getNumOfMaxStudent() - course.getNumOfRegisteredStudent();
+        LinkedList<String> listOfStudent = course.getRegisteredStudent();
 
+        String string = courseNum + "|" + courseName + "|" + availableSeats + "/" + course.getNumOfMaxStudent() +
+                "|";
+        if (listOfStudent.isEmpty()) {
+            string = string + "[]";
+            return string;
+
+        }
+
+        String[] arr = new String[listOfStudent.size()];
+        for (int i = 0; i < listOfStudent.size(); i++) {
+            arr[i] = listOfStudent.get(i);
+        }
+
+        string = string + arr.toString();
+
+        return string;
+    }
+
+    public String studentStat(String userName) {
+        String string = userName + "|";
+        Student student = findStudent(userName);
+
+        LinkedList<Course> courses = student.getCoursesList();
+        if (courses.isEmpty()) {
+            string = string + "[]";
+            return string;
+        }
+
+        for (int i = 0; i < courses.size(); i++) {
+            string = string + courses.get(i).getCourseNum() + ",";
+        }
+
+        return string;
+    }
+
+    public String isRegistered(String userName, int courseNum) {
+        boolean courseIsExist = false;
+        Course course = findCourse(courseNum);
+
+        LinkedList<String> registeredStudents = course.getRegisteredStudent();
+        for (int i = 0; i < registeredStudents.size(); i++) {
+            if (registeredStudents.get(i).equals(userName)) {
+                return "REGISTERD";
+            }
+        }
+
+        return "NOT REGISTERED";
+
+    }
+
+    public Message unRegister(String userName, int courseNum) {
+        int opCode = 10;
+        Course course = findCourse(courseNum);
+        Student student = findStudent(userName);
+        LinkedList<String> regStudent = course.getRegisteredStudent();//the student who registered to course
+        LinkedList<Course> coursesList = student.getCoursesList(); //the courses of the students
+
+        if(course==null |student ==null){
+            return new Error(10);
+        }
+        //delete the student from the course
+        for (int i = 0; i < regStudent.size(); i++) {
+            if (regStudent.get(i).equals(userName)) {
+                regStudent.remove(i);
+            }
+        }
+
+        for (int i = 0; i < coursesList.size(); i++) {
+            if (coursesList.get(i).equals(course)) {
+                coursesList.remove(i);
+            }
+        }
+
+       return course.removeNumOfRegisteredStudent(opCode);
+
+    }
+
+    public LinkedList<Integer> myCourses(String userName){
+        Student student = findStudent(userName);
+        LinkedList<Course> courses = student.getCoursesList();
+        LinkedList<Integer> myCourses = null;
+
+        for(int i=0; i<courses.size(); i++) {
+            myCourses.add(courses.get(i).getCourseNum());
+        }
+        return myCourses;
+    }
 }
