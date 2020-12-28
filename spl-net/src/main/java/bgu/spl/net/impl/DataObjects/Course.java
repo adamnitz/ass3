@@ -49,16 +49,15 @@ public class Course {
     }
 
     public Message addNumOfRegisteredStudent(int opCode){
-        if(numOfRegisteredStudent < numOfMaxStudent){
+        if(numOfRegisteredStudent < numOfMaxStudent){//check if we need to add =
             numOfRegisteredStudent++;
         }
         else{
             return new Error(opCode);
         }
         return new Ack(opCode);
-
-
     }
+
     public Message removeNumOfRegisteredStudent(int opCode){
         if(numOfRegisteredStudent>0){
             numOfRegisteredStudent--;

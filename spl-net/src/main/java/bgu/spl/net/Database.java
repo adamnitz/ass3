@@ -49,8 +49,6 @@ public class Database {
      * into the Database, returns true if successful.
      */
     boolean initialize(String coursesFilePath) {
-        // TODO: implement
-
         FileReader file = null;//TODO:in main ill give to the initialize the courses.txt
         try {
             file = new FileReader(coursesFilePath);
@@ -109,19 +107,18 @@ public class Database {
         }
     }
 
+
     public User findUser(String userName) {
         boolean isExist = false;
         User user = null;
         for (int i = 0; i < allUsers.size() && !isExist; i++) {
-            if (allUsers.get(i) instanceof Student) {
-                user = allUsers.get(i);
-                if (user.getUserName().equals(userName))
-                    isExist = true;
-            }
+            user = allUsers.get(i);
+            if (user.getUserName().equals(userName))
+                isExist = true;
         }
-
         return user;
     }
+
 
     public Student findStudent(String userName) {
         boolean isExist = false;
@@ -133,7 +130,6 @@ public class Database {
                     isExist = true;
             }
         }
-
         return student;
     }
 
@@ -146,20 +142,17 @@ public class Database {
                 courseIsExist = true;
             }
         }
-
         return course;
     }
 
     public Message studentReg(String userName, String password) {
         int opCode = 2;
-        boolean isExist = false;
-        //TODO:think if it's work because of the instanceOf
-
-        if (findStudent(userName) != null) {
+        if (findStudent(userName) != null)
             return new Error(opCode);
-        } else {
-            Student admin = new Student(userName, password);
-            allUsers.add(admin);
+
+        else {
+            Student stu = new Student(userName, password);
+            allUsers.add(stu);
             return new Ack(opCode);
         }
     }
@@ -168,70 +161,60 @@ public class Database {
     public Message logIn(String userName, String password) {
         int opCode = 3;
         User user = findUser(userName);
-
-        if (user == null | user.isLogIn()) {
+        if (user == null | user.isLogIn() | (!user.getPassword().equals(password)))
             return new Error(opCode);
-        } else if (!user.getPassword().equals(password)) {
-            return new Error(opCode);
-        }
 
         user.setLogIn(true);
         return new Ack(opCode);
-
     }
+
 
     public Message logOut(String userName) {
         int opCode = 4;
-
         User user = findUser(userName);
-        if (user.getUserName().equals(userName)) {
-            if (user.isLogIn()) {
+        if (user != null) {
+            if (!user.isLogIn())
                 return new Error(opCode);
-            } else {
+            else {
                 user.setLogIn(false);
                 return new Ack(opCode);
             }
         }
-
         return new Error(opCode);
-
     }
 
     public Message courseReg(String userName, int courseNum) {
         int opCode = 5;
         Course course = findCourse(courseNum);
         Student student = null;
-        if (course.equals(courseNum)) {
-            if (course.getNumOfRegisteredStudent() >= course.getNumOfMaxStudent()) {
-                return new Error(opCode);
-            }
-        }
 
-
-        if (course == null) {
+        if (course == null)
             return new Error(opCode);
-        }
+
+        else if (course.getNumOfRegisteredStudent() >= course.getNumOfMaxStudent())
+            return new Error(opCode);
 
         for (int i = 0; i < allUsers.size(); i++) {
+
             if (allUsers.get(i).getUserName().equals(userName)) {
                 if (allUsers.get(i) instanceof Admin) {
                     return new Error(opCode);
                 }
-                if (allUsers.get(i) instanceof Student) {
-                    student = (Student) allUsers.get(i);
-                }
+
+                student = (Student) allUsers.get(i);
+
                 if (!allUsers.get(i).isLogIn()) {
                     return new Error(opCode);
                 }
             }
         }
 
-        kdamCheck(student, courseNum);
+        if (kdamCheck(student, courseNum) instanceof Error)
+            return new Error(opCode);
 
         student.addCourse(course);
         course.addStudentToCourse(student.getUserName());
         return course.addNumOfRegisteredStudent(opCode);
-
 
     }
 
@@ -258,9 +241,9 @@ public class Database {
             }
             found = false;
         }
-        if (!allKdamDone) {
+        if (!allKdamDone)
             return new Error(opCode);
-        }
+
         return new Ack(opCode);
     }
 
@@ -276,23 +259,19 @@ public class Database {
         if (listOfStudent.isEmpty()) {
             string = string + "[]";
             return string;
-
         }
 
         String[] arr = new String[listOfStudent.size()];
         for (int i = 0; i < listOfStudent.size(); i++) {
             arr[i] = listOfStudent.get(i);
         }
-
         string = string + arr.toString();
-
         return string;
     }
 
     public String studentStat(String userName) {
         String string = userName + "|";
         Student student = findStudent(userName);
-
         LinkedList<Course> courses = student.getCoursesList();
         if (courses.isEmpty()) {
             string = string + "[]";
@@ -302,35 +281,34 @@ public class Database {
         for (int i = 0; i < courses.size(); i++) {
             string = string + courses.get(i).getCourseNum() + ",";
         }
-
         return string;
     }
 
     public String isRegistered(String userName, int courseNum) {
-        boolean courseIsExist = false;
         Course course = findCourse(courseNum);
-
-        LinkedList<String> registeredStudents = course.getRegisteredStudent();
-        for (int i = 0; i < registeredStudents.size(); i++) {
-            if (registeredStudents.get(i).equals(userName)) {
-                return "REGISTERD";
+        if (course != null) {
+            LinkedList<String> registeredStudents = course.getRegisteredStudent();
+            for (int i = 0; i < registeredStudents.size(); i++) {
+                if (registeredStudents.get(i).equals(userName)) {
+                    return "REGISTERD";
+                }
             }
         }
-
         return "NOT REGISTERED";
-
     }
 
     public Message unRegister(String userName, int courseNum) {
         int opCode = 10;
         Course course = findCourse(courseNum);
         Student student = findStudent(userName);
+
+        if (course == null | student == null)
+            return new Error(10);
+
+
         LinkedList<String> regStudent = course.getRegisteredStudent();//the student who registered to course
         LinkedList<Course> coursesList = student.getCoursesList(); //the courses of the students
 
-        if(course==null |student ==null){
-            return new Error(10);
-        }
         //delete the student from the course
         for (int i = 0; i < regStudent.size(); i++) {
             if (regStudent.get(i).equals(userName)) {
@@ -344,18 +322,23 @@ public class Database {
             }
         }
 
-       return course.removeNumOfRegisteredStudent(opCode);
+        return course.removeNumOfRegisteredStudent(opCode);
 
     }
 
-    public LinkedList<Integer> myCourses(String userName){
-        Student student = findStudent(userName);
-        LinkedList<Course> courses = student.getCoursesList();
-        LinkedList<Integer> myCourses = null;
 
-        for(int i=0; i<courses.size(); i++) {
-            myCourses.add(courses.get(i).getCourseNum());
+    public LinkedList<Integer> myCourses(String userName) {
+        Student student = findStudent(userName);
+        if (student != null) {
+            LinkedList<Course> courses = student.getCoursesList();
+            LinkedList<Integer> myCourses = null;
+
+            for (int i = 0; i < courses.size(); i++) {
+                myCourses.add(courses.get(i).getCourseNum());
+            }
+            return myCourses;
         }
-        return myCourses;
+        return null;
+
     }
 }
