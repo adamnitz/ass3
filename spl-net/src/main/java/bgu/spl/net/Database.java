@@ -5,6 +5,9 @@ import bgu.spl.net.impl.DataObjects.Admin;
 import bgu.spl.net.impl.DataObjects.Course;
 import bgu.spl.net.impl.DataObjects.Student;
 import bgu.spl.net.impl.DataObjects.User;
+import bgu.spl.net.impl.Message.Error;
+import bgu.spl.net.impl.Message.Ack;
+
 
 import javax.xml.crypto.Data;
 import java.io.*;
@@ -100,7 +103,8 @@ public class Database {
             }
         }
         if (isExist) {
-            //TODO:SEND ERROR MESSAGE
+           // return new Error(1);
+            // TODO:SEND ERROR MESSAGE
         } else {
             Student admin = new Student(userName, password);
             allUsers.add(admin);
@@ -196,7 +200,6 @@ public class Database {
         }
 
       kdamCheck(student,course);
-
 
         student.addCourse(course);
         course.addNumOfRegisteredStudent();
