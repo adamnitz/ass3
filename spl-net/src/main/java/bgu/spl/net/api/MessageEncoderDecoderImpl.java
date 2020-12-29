@@ -28,68 +28,20 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder{
 
         //know when the message over by the opcode
         else if(fullOpcode == 2) {
-            if (opCode == 1) {
+            if (opCode == 1 || opCode == 2 || opCode == 3 || opCode == 8 ||opCode == 12 ) {
                 if (zeroCounter == 2)
                     return popString();
                 if (nextByte == '\0')
                     zeroCounter++;
-            } else if (opCode == 2) {
-                if (zeroCounter == 2)
-                    return popString();
-                if (nextByte == '\0')
-                    zeroCounter++;
-            } else if (opCode == 3) {
-                if (zeroCounter == 2)
-                    return popString();
-                if (nextByte == '\0')
-                    zeroCounter++;
-            } else if (opCode == 4) {
+            }  else if (opCode == 4 || opCode == 11) {
                 if (bytesCounter == 2)
                     return popString();
                 bytesCounter++;
-            } else if (opCode == 5) {
+            } else if (opCode == 5 || opCode == 6 || opCode == 7 ||opCode == 9 || opCode == 10 ||opCode == 13) {
                 if (bytesCounter == 4)
                     return popString();
                 bytesCounter++;
             }
-            else if (opCode == 6) {
-                if (bytesCounter == 4)
-                    return popString();
-                bytesCounter++;
-            }
-            else if(opCode==7){
-                if (bytesCounter == 4)
-                    return popString();
-                bytesCounter++;
-            } else if (opCode == 8) {
-                if(zeroCounter==1)
-                    return popString();
-                if (nextByte == '\0')
-                    zeroCounter++;
-            } else if(opCode == 9){
-                if (bytesCounter == 4)
-                    return popString();
-                bytesCounter++;
-            } else if(opCode == 10) {
-                if (bytesCounter == 4)
-                    return popString();
-                bytesCounter++;
-            }
-            else if(opCode == 11) {
-                if (bytesCounter == 2)
-                    return popString();
-                bytesCounter++;
-            }else if (opCode == 12) {
-                if(zeroCounter==1)
-                    return popString();
-                if (nextByte == '\0')
-                    zeroCounter++;
-            } else if(opCode == 13) {
-                if (bytesCounter == 4)
-                    return popString();
-                bytesCounter++;
-            }
-
         }
         pushByte(nextByte);
         return null;
