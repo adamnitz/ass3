@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class MessageEncoderDecoderImpl implements MessageEncoderDecoder{
-    @Override
 
     private byte[] bytes = new byte[1<<10];//check how many bites
     private int len=0;
@@ -13,6 +12,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder{
     int zeroCounter = 0;
     int bytesCounter = 0;
 
+    @Override
     public String decodeNextByte(byte nextByte) {
         //read the opcode
         if(fullOpcode==0) {
@@ -47,11 +47,11 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder{
         return null;
     }
 
-
     @Override
-    public byte[] encode(String message) {
+    public byte[] encode(Object message) {
         return (message+ "\n").getBytes();
     }
+
 
     public void pushByte(byte nextByte){
         if(len>=bytes.length){
