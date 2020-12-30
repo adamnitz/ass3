@@ -11,29 +11,38 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder{
     int fullOpcode=0;
     int zeroCounter = 0;
     int bytesCounter = 0;
+    byte[] twoFirstBytes;
+
 
     @Override
     public String decodeNextByte(byte nextByte) {
+
         //read the opcode
         if(fullOpcode==0) {
-            opCode = nextByte;
+            twoFirstBytes[0] = nextByte;
             fullOpcode++;
             bytesCounter++;
         }
         if(fullOpcode==1){
-            opCode = (short) (opCode+nextByte);
+            twoFirstBytes[1] = nextByte;
             fullOpcode++;
             bytesCounter++;
         }
 
         //know when the message over by the opcode
         else if(fullOpcode == 2) {
-            if (opCode == 1 || opCode == 2 || opCode == 3 || opCode == 8 ||opCode == 12 ) {
+            opCode = bytesToShort(twoFirstBytes);
+            if (opCode == 1 || opCode == 2 || opCode == 3  ) {
                 if (zeroCounter == 2)
                     return popString();
                 if (nextByte == '\0')
                     zeroCounter++;
-            }  else if (opCode == 4 || opCode == 11) {
+            } else if (opCode == 8 ||opCode == 12){
+                if (zeroCounter == 1)
+                    return popString();
+                if (nextByte == '\0')
+                    zeroCounter++;
+            } else if (opCode == 4 || opCode == 11) {
                 if (bytesCounter == 2)
                     return popString();
                 bytesCounter++;
@@ -64,6 +73,12 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder{
     public String popString(){
         String result = new String(bytes, 0, len, StandardCharsets.UTF_8);
         len=0;
+        return result;
+    }
+
+    public short bytesToShort(byte [] byteArr){
+        short result = (short)((byteArr[0] & 0xff) << 8);
+        result += (short)(byteArr[1] & 0xff);
         return result;
     }
 

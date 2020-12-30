@@ -209,7 +209,7 @@ public class Database {
             }
         }
 
-        if (kdamCheck(student, courseNum) instanceof Error)
+        if (kdamCheck(userName, courseNum) instanceof Error)
             return new Error(opCode);
 
         student.addCourse(course);
@@ -218,8 +218,9 @@ public class Database {
 
     }
 
-    public Message kdamCheck(Student student, int courseNumber) {
+    public Message kdamCheck(String userName, int courseNumber) {
         int opCode = 6;
+        Student student = findStudent(userName);
         Course course = findCourse(courseNumber);
         LinkedList<Course> courseList = student.getCoursesList();
         LinkedList<Course> kdamCourseList = course.getKdamCourseList();
@@ -247,18 +248,20 @@ public class Database {
         return new Ack(opCode);
     }
 
-    public String courseStat(int courseNumber) {
+    public Message courseStat(int courseNumber) {
+        int opCode=7;
         Course course = findCourse(courseNumber);
         int courseNum = course.getCourseNum();
         String courseName = course.getCourseName();
         int availableSeats = course.getNumOfMaxStudent() - course.getNumOfRegisteredStudent();
         LinkedList<String> listOfStudent = course.getRegisteredStudent();
+        Ack ack = new Ack(opCode);
 
         String string = courseNum + "|" + courseName + "|" + availableSeats + "/" + course.getNumOfMaxStudent() +
                 "|";
         if (listOfStudent.isEmpty()) {
             string = string + "[]";
-            return string;
+            ack.setData(string);
         }
 
         String[] arr = new String[listOfStudent.size()];
@@ -266,35 +269,44 @@ public class Database {
             arr[i] = listOfStudent.get(i);
         }
         string = string + arr.toString();
-        return string;
+        ack.setData(string);
+
+        return ack;
     }
 
-    public String studentStat(String userName) {
+    public Message studentStat(String userName) {
+        int opCode = 8;
         String string = userName + "|";
         Student student = findStudent(userName);
         LinkedList<Course> courses = student.getCoursesList();
+        Ack ack = new Ack(opCode);
+
         if (courses.isEmpty()) {
             string = string + "[]";
-            return string;
+            ack.setData(string);
         }
 
         for (int i = 0; i < courses.size(); i++) {
             string = string + courses.get(i).getCourseNum() + ",";
         }
-        return string;
+        ack.setData(string);
+        return ack;
     }
 
-    public String isRegistered(String userName, int courseNum) {
+    public Ack isRegistered(String userName, int courseNum) {
+        int opCode = 9;
+        Ack ack = new Ack(opCode);
         Course course = findCourse(courseNum);
         if (course != null) {
             LinkedList<String> registeredStudents = course.getRegisteredStudent();
             for (int i = 0; i < registeredStudents.size(); i++) {
                 if (registeredStudents.get(i).equals(userName)) {
-                    return "REGISTERD";
+                    ack.setData("REGISTERD");
                 }
             }
         }
-        return "NOT REGISTERED";
+        ack.setData("NOT REGISTERED");
+        return ack;
     }
 
     public Message unRegister(String userName, int courseNum) {
@@ -326,8 +338,9 @@ public class Database {
 
     }
 
-
-    public LinkedList<Integer> myCourses(String userName) {
+    public Message myCourses(String userName) {
+        int opCode=11;
+        Ack ack = new Ack(11);
         Student student = findStudent(userName);
         if (student != null) {
             LinkedList<Course> courses = student.getCoursesList();
@@ -336,9 +349,9 @@ public class Database {
             for (int i = 0; i < courses.size(); i++) {
                 myCourses.add(courses.get(i).getCourseNum());
             }
-            return myCourses;
+            ack.setMyCourses(myCourses);
+            return ack;
         }
-        return null;
-
+        return new Error(opCode);
     }
 }
