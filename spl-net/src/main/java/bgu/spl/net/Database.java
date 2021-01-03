@@ -48,7 +48,7 @@ public class Database {
      * loades the courses from the file path specified
      * into the Database, returns true if successful.
      */
-    boolean initialize(String coursesFilePath) {
+    public boolean initialize(String coursesFilePath) {
         FileReader file = null;//TODO:in main ill give to the initialize the courses.txt
         try {
             file = new FileReader(coursesFilePath);
