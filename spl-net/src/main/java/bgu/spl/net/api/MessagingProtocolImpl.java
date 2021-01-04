@@ -3,7 +3,7 @@ package bgu.spl.net.api;
 import bgu.spl.net.impl.Database;
 import bgu.spl.net.impl.Message.Message;
 
-public class MessagingProtocolImpl implements MessagingProtocol{
+public class MessagingProtocolImpl implements MessagingProtocol<String{
 
     private Database myData = Database.getInstance();
     private String myUser= null;
@@ -75,8 +75,10 @@ public class MessagingProtocolImpl implements MessagingProtocol{
           }
        }
 
+
         return response;
     }
+
 
     @Override
     public boolean shouldTerminate() {
