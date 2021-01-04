@@ -24,7 +24,7 @@ public class Ack extends Message {
         return data;
     }
 
-    public LinkedList<Integer> getMyCourses() {
-        return myCourses;
+    public String getMyCourses() {
+        return myCourses.toString();
     }
 }

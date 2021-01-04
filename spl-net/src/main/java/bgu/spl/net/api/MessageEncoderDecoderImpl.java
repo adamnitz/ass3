@@ -1,5 +1,9 @@
 package bgu.spl.net.api;
 
+import bgu.spl.net.impl.Message.Ack;
+import bgu.spl.net.impl.Message.Error;
+import bgu.spl.net.impl.Message.Message;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -58,7 +62,23 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder{
 
     @Override
     public byte[] encode(Object message) {
-        return (message+ "\n").getBytes();
+        String string="";
+
+        if(message instanceof Ack){
+            string = string + 12 + ((Ack) message).getOpCode();
+            if(opCode == 6){
+                string = string + ((Ack) message).getMyCourses();
+            }
+            if(opCode == 7 || opCode == 8 || opCode == 9){
+                string = string + ((Ack) message).getData();
+            }
+
+        }
+        else if(message instanceof Error){
+            string = string+ 13 + ((Error) message).getOpCode();
+        }
+
+         return string.getBytes();
     }
 
 

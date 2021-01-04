@@ -1,6 +1,6 @@
 package bgu.spl.net.api;
 
-import bgu.spl.net.Database;
+import bgu.spl.net.impl.Database;
 import bgu.spl.net.impl.Message.Message;
 
 public class MessagingProtocolImpl implements MessagingProtocol{
@@ -38,8 +38,11 @@ public class MessagingProtocolImpl implements MessagingProtocol{
                     break;
             }
         }
-        if(opCode==4)
+        if(opCode==4){
             response = myData.logOut(myUser);
+            shouldTerminate=true;
+        }
+
 
        if(opCode == 5||opCode == 6||opCode == 7||opCode == 9||opCode == 10){
            int courseNum = Integer.parseInt(msg.substring(2,msg.length()));
@@ -53,7 +56,7 @@ public class MessagingProtocolImpl implements MessagingProtocol{
                 case 9: response = myData.isRegistered(myUser,courseNum);
                     break;
                 case 10: response =myData.unRegister(myUser,courseNum);
-                shouldTerminate=true;
+
                     break;
             }
 

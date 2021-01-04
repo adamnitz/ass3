@@ -1,6 +1,6 @@
 package bgu.spl.net.impl.BGRSServer;
 
-import bgu.spl.net.Database;
+import bgu.spl.net.impl.Database;
 import bgu.spl.net.api.MessageEncoderDecoderImpl;
 import bgu.spl.net.api.MessagingProtocolImpl;
 import bgu.spl.net.impl.Message.Message;
