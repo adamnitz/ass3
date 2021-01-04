@@ -5,7 +5,7 @@ import bgu.spl.net.impl.Message.Error;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
->
+
 public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message> {
 
     private byte[] bytes = new byte[1 << 10];//check how many bites
@@ -39,7 +39,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                     msgAsStr = popString();
                     return strToMsg(opCode, msgAsStr);
                 }
-
                 if (nextByte == '\0') {
                     zeroCounter++;
                 }
@@ -64,9 +63,11 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                 bytesCounter++;
             }
 
-            pushByte(nextByte);
-            return null;
         }
+
+        pushByte(nextByte);
+        return null;
+
     }
 
 
@@ -128,7 +129,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             Message myCourses = new MyCourses(opCode);
             return myCourses;
         }
-
+        return null;
     }
 
 
