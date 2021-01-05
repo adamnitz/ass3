@@ -33,14 +33,18 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             fullOpcode++;
             bytesCounter++;
         }
-        else if (fullOpcode == 2) {
+      else if (fullOpcode == 2) {
             System.out.println("we have the full opCode");
             opCode = bytesToShort(twoFirstBytes);
             System.out.println("opCode" + opCode);
 
             if (opCode == 1 || opCode == 2 || opCode == 3) {
-                if (zeroCounter == 2) {
+                System.out.println("ZEROCOUNTER " + zeroCounter);
+
+                if (zeroCounter == 1 &&nextByte == '\0' ) {
                     msgAsStr = popString();
+                    System.out.println("msgAsStr " + msgAsStr);
+                    zeroCounter++;
                     return strToMsg(opCode, msgAsStr);
                 }
                 if (nextByte == '\0') {
@@ -78,16 +82,33 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     public Message strToMsg(short opCode, String msg) {
         String userName = "";
         String password = "";
+        System.out.println("mymsg: "+ msg);
+        System.out.println("opCode " + opCode);
         int counter = 2;
         if (opCode == 1 || opCode == 2 || opCode == 3) {
-            while (msg.charAt(counter) != '0' && counter < msg.length())
+            System.out.println("first char: "+  msg.charAt(counter));
+            while (counter < msg.length() && msg.charAt(counter) != '\0' )
                 counter++;
+            System.out.println("counter: " + counter);
             userName = msg.substring(2, counter);
-            counter = counter + 2;
+            System.out.println("userName: " + userName);
+            System.out.println("counter: " + counter);
+            counter = counter +1;
             int firstCharOfPass = counter;
-            while (msg.charAt(counter) != '0' && counter < msg.length())
+            System.out.println("firstChar" + msg.charAt(firstCharOfPass));
+            while (counter < msg.length() && msg.charAt(counter) != '\0' ){
+                System.out.println("check2: "+ msg.charAt(counter));
+                System.out.println("counterInIf: "+ counter);
+
                 counter++;
+            }
+            System.out.println("firstCharOfPass: " + firstCharOfPass);
+            System.out.println("counter: " + counter);
+            System.out.println("msgLenght " + msg.length());
+
+
             password = msg.substring(firstCharOfPass, counter);
+            System.out.println("password: " + password);
             switch (opCode) {
                 case 1:
                     Message adminReg = new AdminReg(opCode, userName, password);
