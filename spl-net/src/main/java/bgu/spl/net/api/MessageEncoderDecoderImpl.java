@@ -14,7 +14,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     int fullOpcode = 0;
     int zeroCounter = 0;
     int bytesCounter = 0;
-    byte[] twoFirstBytes;
+    byte[] twoFirstBytes = new byte[2];
 
 
     @Override
@@ -28,12 +28,16 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             fullOpcode++;
             bytesCounter++;
         }
-        if (fullOpcode == 1) {
+        else if (fullOpcode == 1) {
             twoFirstBytes[1] = nextByte;
             fullOpcode++;
             bytesCounter++;
-        } else if (fullOpcode == 2) {
+        }
+        else if (fullOpcode == 2) {
+            System.out.println("we have the full opCode");
             opCode = bytesToShort(twoFirstBytes);
+            System.out.println("opCode" + opCode);
+
             if (opCode == 1 || opCode == 2 || opCode == 3) {
                 if (zeroCounter == 2) {
                     msgAsStr = popString();

@@ -25,7 +25,7 @@ public class mainTpc {
         }
 
         database.initialize("/.Courses.txt");
-        BlockingConnectionHandler connectionHandler = new BlockingConnectionHandler();
+
     }
 
 

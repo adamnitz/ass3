@@ -23,7 +23,5 @@ public class mainReactor {
 
         database.initialize("/.Courses.txt");
 
-        //creacte blocking connectionHandler
-
     }
 }
