@@ -161,7 +161,7 @@ public class Database {
     public Message logIn(String userName, String password) {
         int opCode = 3;
         User user = findUser(userName);
-        if (user == null | user.isLogIn() | (!user.getPassword().equals(password)))
+        if (user == null || user.isLogIn() || (!user.getPassword().equals(password)))
             return new Error(opCode);
 
         user.setLogIn(true);

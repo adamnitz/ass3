@@ -23,6 +23,7 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
                     response = myData.adminReg(userName,password);
                     break;
                 case 2:
+                    System.out.println("case2---------");
                     userName = ((StudentReg)msg).getUserName();
                     password = ((StudentReg)msg).getPassword();
                     response = myData.studentReg(userName,password);

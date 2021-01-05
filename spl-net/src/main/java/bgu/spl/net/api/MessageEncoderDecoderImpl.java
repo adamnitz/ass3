@@ -112,6 +112,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             switch (opCode) {
                 case 1:
                     Message adminReg = new AdminReg(opCode, userName, password);
+                    System.out.println("brforeReturn");
                     return adminReg;
                 case 2:
                     Message studentReg = new StudentReg(opCode, userName, password);
@@ -161,25 +162,62 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
 
     @Override
     public byte[] encode(Message message) {
+        short opCodeMsg;
         String string="";
 
+        short opCodeAck=12;
+        short opCodeErr=13;
+
+        byte [] bytesToClient = null;
+        byte [] opCodeArr;
+        byte [] opCodeMsgArr;
         if(message instanceof Ack){
-            string = string + 12 + ((Ack) message).getOpCode();
+            opCodeArr = shortToBytes(opCodeAck);
+            opCodeMsg = (short)(((Ack) message).getOpCode());
+            opCodeMsgArr =  shortToBytes(opCodeMsg);
+            bytesToClient = mergeBytes(opCodeArr, opCodeMsgArr);
             if(opCode == 6){
                 string = string + ((Ack) message).getMyCourses();
+                bytesToClient = mergeBytes(bytesToClient, string.getBytes());
             }
             if(opCode == 7 || opCode == 8 || opCode == 9){
                 string = string + ((Ack) message).getData();
+                bytesToClient = mergeBytes(bytesToClient, string.getBytes());
+
             }
 
         }
         else if(message instanceof Error){
-            string = string+ 13 + ((Error) message).getOpCode();
+            opCodeArr = shortToBytes(opCodeErr);
+            opCodeMsg =  (short)(((Error) message).getOpCode());
+            opCodeMsgArr =  shortToBytes(opCodeMsg);
+            bytesToClient = mergeBytes(opCodeArr, opCodeMsgArr);
         }
 
-         return string.getBytes();
+        System.out.println("");
+        for(int i=0 ;i <bytesToClient.length; i++){
+            System.out.print(bytesToClient[i] + ", ");
+        }
+         return bytesToClient;
     }
 
+
+    public byte[] mergeBytes(byte [] arr1,byte [] arr2 ){
+        int len = arr1.length + arr2.length;
+        byte [] merge = new byte[len];
+        int i=0;
+        for(int j=0 ;j<arr1.length; j++){
+            merge[i] = arr1[j];
+            i++;
+        }
+
+        for(int j=0; j< arr2.length; j++){
+            merge[i]=arr2[j];
+            i++;
+        }
+
+        return merge;
+    }
 
     public void pushByte(byte nextByte){
         if(len>=bytes.length){
@@ -199,6 +237,14 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         short result = (short)((byteArr[0] & 0xff) << 8);
         result += (short)(byteArr[1] & 0xff);
         return result;
+    }
+
+    public byte[] shortToBytes(short num)
+    {
+        byte[] bytesArr = new byte[2];
+        bytesArr[0] = (byte)((num >> 8) & 0xFF);
+        bytesArr[1] = (byte)(num & 0xFF);
+        return bytesArr;
     }
 
 }
