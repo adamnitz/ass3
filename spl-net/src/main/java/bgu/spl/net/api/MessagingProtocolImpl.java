@@ -23,7 +23,6 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
                     response = myData.adminReg(userName,password);
                     break;
                 case 2:
-                    System.out.println("case2---------");
                     userName = ((StudentReg)msg).getUserName();
                     password = ((StudentReg)msg).getPassword();
                     response = myData.studentReg(userName,password);
@@ -38,7 +37,6 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
         }
         if(opCode==4){
             response = myData.logOut(myUser);
-            System.out.println("----opCode4InProtocol");
             shouldTerminate=true;
         }
 
@@ -48,7 +46,6 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
                 case 5:
                     courseNum = ((CourseReg)msg).getCourseNum();
                     response = myData.courseReg(myUser,courseNum);
-                    System.out.println("there is a response");
                     break;
                 case 6:
                     courseNum = ((KdamCheck)msg).getCourseNum();
@@ -77,17 +74,6 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
               response = myData.myCourses(myUser);
           }
 
-
-        for(int i=0; i<myData.getAllUsers().size(); i++){
-            System.out.println("User " + i + ":" + myData.getAllUsers().get(i).getUserName());
-            System.out.print(" ISLOGIN " + i + ":" + myData.getAllUsers().get(i).isLogIn());
-            System.out.println("Password " + i + ":" + myData.getAllUsers().get(i).getPassword());
-        }
-
-
-        if(response ==null){
-            System.out.println("response is null");
-        }
         return response;
     }
 

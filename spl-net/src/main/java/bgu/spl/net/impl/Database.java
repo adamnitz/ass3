@@ -100,6 +100,7 @@ public class Database {
         return true;
     }
 
+
     public Message adminReg(String userName, String password) {
         int opCode = 1;
         boolean isExist = false;
@@ -243,14 +244,19 @@ public class Database {
         LinkedList<Course> kdamCourseList = course.getKdamCourseList();
         boolean studentDoneThisCourse = false;
         boolean allKdamDone = true;
-        for (int i=0;i< courseList.size();i++){
+        boolean finish=false;
+        for (int i=0;i< courseList.size()&& !finish;i++){
             for(int j = 0;j<kdamCourseList.size() && !studentDoneThisCourse && allKdamDone;j++){
                 boolean isEquals = courseList.get(i).equals(kdamCourseList.get(j));
                 if(!isEquals)
                     studentDoneThisCourse=false;
-                else
-                    studentDoneThisCourse=true;
-
+                else {
+                    if (j == kdamCourseList.size() - 1) {
+                        allKdamDone = true;
+                        finish = true;
+                    }
+                    studentDoneThisCourse = true;
+                }
                 if((i == courseList.size() - 1)) {
                     if (isEquals)
                         allKdamDone = true;
@@ -265,17 +271,19 @@ public class Database {
         if (!allKdamDone) {
             return new Error(opCode);
         }
-        return new Ack(opCode);
+
+        Ack ack = new Ack(opCode);
+        ack.setKdamCourses(kdamCourseList);
+        return ack;
     }
 
-    public Message kdamCheck(int courseNumber){
+   /* public Message kdamCheck(int courseNumber){
         int opCode=6;
         Course currCurse=findCourse(courseNumber);
         LinkedList<Course> kdam = currCurse.getKdamCourseList();
-            return new KdamCheck(opCode, courseNumber,kdam);
 
-
-    }
+        return new KdamCheck(opCode, courseNumber,kdam);
+    }*/
 
     public Message courseStat(int courseNumber) {
         int opCode=7;

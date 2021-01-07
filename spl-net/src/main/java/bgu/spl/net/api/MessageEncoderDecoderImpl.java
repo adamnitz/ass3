@@ -26,7 +26,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
 
         String msgAsStr = "";
         pushByte(nextByte);
-        System.out.println("nextByte " + nextByte);
 
         //read the opcode
         if (fullOpcode == 0) {
@@ -69,7 +68,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             } else if (opCode == 5 || opCode == 6 || opCode == 7 || opCode == 9 || opCode == 10 ) {
                 if (len == 4) {
                     msgAsStr = popString();
-                    System.out.println(msgAsStr);
                     return strToMsg(opCode, msgAsStr);
                 }
                // bytesCounter++;
@@ -117,7 +115,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             switch (opCode) {
                 case 5:
                     Message courseReg = new CourseReg(opCode, courseNum);
-                    System.out.println("returned courseReg");
                     return courseReg;
                 case 6:
                     LinkedList<Course> kdam= myData.findCourse(courseNum).getKdamCourseList();
@@ -164,11 +161,11 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             opCodeMsgArr =  shortToBytes(opCodeMsg);
             bytesToClient = mergeBytes(opCodeArr, opCodeMsgArr);
             if(opCode == 6){
-                string = string + ((Ack) message).getMyCourses();
+                string = string + ((Ack) message).getKdamCourses() + '\0';
                 bytesToClient = mergeBytes(bytesToClient, string.getBytes());
             }
             if(opCode == 7 || opCode == 8 || opCode == 9){
-                string = string + ((Ack) message).getData();
+                string = string + ((Ack) message).getData() +'\0';
                 bytesToClient = mergeBytes(bytesToClient, string.getBytes());
 
             }
@@ -180,9 +177,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             bytesToClient = mergeBytes(opCodeArr, opCodeMsgArr);
         }
 
-        System.out.println("");
         for(int i=0 ;i <bytesToClient.length; i++){
-            System.out.print(bytesToClient[i] + ", ");
         }
          return bytesToClient;
     }
