@@ -12,21 +12,15 @@ import java.io.IOException;
 public class mainTpc {
 
     public static void main(String[] args){
-
         Database database= Database.getInstance();
+        database.initialize("./Courses.txt");
 
-        try(Server<Message> srv = Server.threadPerClient(Integer.parseInt(args[0]), () -> new MessagingProtocolImpl(), () -> new MessageEncoderDecoderImpl()))
-        {
+        try(Server<Message> srv = Server.threadPerClient(Integer.parseInt(args[0]), () -> new MessagingProtocolImpl(), () -> new MessageEncoderDecoderImpl())){
             srv.serve();
         }
-
         catch (IOException e) {
                     System.out.println("IOException in mainTpc");
         }
 
-        database.initialize("/.Courses.txt");
-
     }
-
-
 }

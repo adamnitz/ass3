@@ -37,6 +37,14 @@ public class Database {
         allUsers = new Vector<>();
     }
 
+    public Vector<Course> getAllCourses() {
+        return allCourses;
+    }
+
+    public Vector<User> getAllUsers() {
+        return allUsers;
+    }
+
     /**
      * Retrieves the single instance of this class.
      */
@@ -49,33 +57,29 @@ public class Database {
      * into the Database, returns true if successful.
      */
     public boolean initialize(String coursesFilePath) {
-        FileReader file = null;//TODO:in main ill give to the initialize the courses.txt
         try {
-            file = new FileReader(coursesFilePath);
-        } catch (FileNotFoundException e) {
-            System.out.print("The File not found");
-        }
-
-        BufferedReader in = new BufferedReader(file);
-        String line = null;
-        try {
-            line = in.readLine();
-        } catch (IOException e) {
-            return false;
-        }
-
-        while (line != null) {
-            String[] lineArr = line.split("|");
-            int courseNum = Integer.parseInt(lineArr[0]);
-            String courseName = lineArr[1];
-            LinkedList<Course> kdamCourseList = new LinkedList<Course>();
-            String[] kdamCourseArr = lineArr[3].split(",");
-            for (int i = 0; i < kdamCourseArr.length; i++) {
-                int kdamCourseNum = Integer.parseInt(kdamCourseArr[i]);
-                Course course = allCourses.get(kdamCourseNum);
-                kdamCourseList.add(course);
-                //TODO:check if it's possibbole that there is course that wasnt registered yet
+            FileReader file = new FileReader(coursesFilePath);
+            System.out.println(file+" file");
+            BufferedReader in = new BufferedReader(file);
+            String line = null;
+            try {
+                line = in.readLine();
+            } catch (IOException e) {
+                return false;
             }
+
+            while (line != null) {
+                String[] lineArr = line.split("|");
+                int courseNum = Integer.parseInt(lineArr[0]);
+                String courseName = lineArr[1];
+                LinkedList<Course> kdamCourseList = new LinkedList<Course>();
+                String[] kdamCourseArr = lineArr[3].split(",");
+                for (int i = 0; i < kdamCourseArr.length; i++) {
+                    int kdamCourseNum = Integer.parseInt(kdamCourseArr[i]);
+                    Course course = allCourses.get(kdamCourseNum);
+                    kdamCourseList.add(course);
+                //TODO:check if it's possibbole that there is course that wasnt registered yet
+                }
             int numOfMaxStudents = Integer.parseInt(lineArr[3]);
             Course course = new Course(courseNum, courseName, kdamCourseList, numOfMaxStudents);
             allCourses.add(course);
@@ -84,6 +88,11 @@ public class Database {
             } catch (IOException e) {
                 return false;
             }
+
+        }
+    }
+        catch (FileNotFoundException e) {
+                System.out.print("The File not found");
         }
         return true;
     }
@@ -101,7 +110,7 @@ public class Database {
         if (isExist) {
             return new Error(opCode);
         } else {
-            Student admin = new Student(userName, password);
+            User admin = new Admin(userName, password);
             allUsers.add(admin);
             return new Ack(opCode);
         }
@@ -173,13 +182,17 @@ public class Database {
         int opCode = 4;
         User user = findUser(userName);
         if (user != null) {
-            if (!user.isLogIn())
+            System.out.println("check in function: " + user.isLogIn());
+            if (!user.isLogIn()){
+                System.out.println("enter186");
                 return new Error(opCode);
+            }
             else {
                 user.setLogIn(false);
                 return new Ack(opCode);
             }
         }
+        System.out.println("dataBase ok");
         return new Error(opCode);
     }
 

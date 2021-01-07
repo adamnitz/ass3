@@ -38,13 +38,12 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
         }
         if(opCode==4){
             response = myData.logOut(myUser);
+            System.out.println("----opCode4InProtocol");
             shouldTerminate=true;
         }
 
-
        if(opCode == 5||opCode == 6||opCode == 7||opCode == 9||opCode == 10){
-           int courseNum;
-
+         int courseNum;
            switch(opCode){
                 case 5:
                     courseNum = ((CourseReg)msg).getCourseNum();
@@ -76,6 +75,15 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
           if(opCode==11){
               response = myData.myCourses(myUser);
           }
+
+
+        for(int i=0; i<myData.getAllUsers().size(); i++){
+            System.out.println("User " + i + ":" + myData.getAllUsers().get(i).getUserName());
+            System.out.print(" ISLOGIN " + i + ":" + myData.getAllUsers().get(i).isLogIn());
+            System.out.println("Password " + i + ":" + myData.getAllUsers().get(i).getPassword());
+        }
+
+
 
         return response;
     }

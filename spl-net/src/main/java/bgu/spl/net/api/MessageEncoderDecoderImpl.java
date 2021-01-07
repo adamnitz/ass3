@@ -17,33 +17,32 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     byte[] twoFirstBytes = new byte[2];
 
 
+
     @Override
     public Message decodeNextByte(byte nextByte) {
 
         String msgAsStr = "";
+        pushByte(nextByte);
 
         //read the opcode
         if (fullOpcode == 0) {
             twoFirstBytes[0] = nextByte;
             fullOpcode++;
-            bytesCounter++;
+           // bytesCounter++;
+
         }
         else if (fullOpcode == 1) {
             twoFirstBytes[1] = nextByte;
             fullOpcode++;
-            bytesCounter++;
+           // bytesCounter++;
         }
       else if (fullOpcode == 2) {
-            System.out.println("we have the full opCode");
             opCode = bytesToShort(twoFirstBytes);
             System.out.println("opCode" + opCode);
 
             if (opCode == 1 || opCode == 2 || opCode == 3) {
-                System.out.println("ZEROCOUNTER " + zeroCounter);
-
                 if (zeroCounter == 1 &&nextByte == '\0' ) {
                     msgAsStr = popString();
-                    System.out.println("msgAsStr " + msgAsStr);
                     zeroCounter++;
                     return strToMsg(opCode, msgAsStr);
                 }
@@ -58,22 +57,24 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                 if (nextByte == '\0')
                     zeroCounter++;
             } else if (opCode == 4 || opCode == 11) {
-                if (bytesCounter == 2) {
+                if (len == 2) {
                     msgAsStr = popString();
                     return strToMsg(opCode, msgAsStr);
                 }
-                bytesCounter++;
-            } else if (opCode == 5 || opCode == 6 || opCode == 7 || opCode == 9 || opCode == 10 || opCode == 13) {
-                if (bytesCounter == 4) {
+               // bytesCounter++;
+            } else if (opCode == 5 || opCode == 6 || opCode == 7 || opCode == 9 || opCode == 10 ) {
+                System.out.println("in else if");
+                if (len == 4) {
                     msgAsStr = popString();
+                    System.out.println(msgAsStr);
                     return strToMsg(opCode, msgAsStr);
                 }
-                bytesCounter++;
+               // bytesCounter++;
             }
 
         }
-
-        pushByte(nextByte);
+        //pushByte(nextByte);
+        //bytesCounter++;
         return null;
 
     }
@@ -82,37 +83,20 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     public Message strToMsg(short opCode, String msg) {
         String userName = "";
         String password = "";
-        System.out.println("mymsg: "+ msg);
-        System.out.println("opCode " + opCode);
         int counter = 2;
         if (opCode == 1 || opCode == 2 || opCode == 3) {
-            System.out.println("first char: "+  msg.charAt(counter));
             while (counter < msg.length() && msg.charAt(counter) != '\0' )
                 counter++;
-            System.out.println("counter: " + counter);
             userName = msg.substring(2, counter);
-            System.out.println("userName: " + userName);
-            System.out.println("counter: " + counter);
             counter = counter +1;
             int firstCharOfPass = counter;
-            System.out.println("firstChar" + msg.charAt(firstCharOfPass));
             while (counter < msg.length() && msg.charAt(counter) != '\0' ){
-                System.out.println("check2: "+ msg.charAt(counter));
-                System.out.println("counterInIf: "+ counter);
-
                 counter++;
             }
-            System.out.println("firstCharOfPass: " + firstCharOfPass);
-            System.out.println("counter: " + counter);
-            System.out.println("msgLenght " + msg.length());
-
-
             password = msg.substring(firstCharOfPass, counter);
-            System.out.println("password: " + password);
             switch (opCode) {
                 case 1:
                     Message adminReg = new AdminReg(opCode, userName, password);
-                    System.out.println("brforeReturn");
                     return adminReg;
                 case 2:
                     Message studentReg = new StudentReg(opCode, userName, password);
@@ -125,7 +109,10 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             Message logOut = new LogOut(opCode);
             return logOut;
         } else if (opCode == 5 || opCode == 6 || opCode == 7 || opCode == 9 || opCode == 10) {
+            //System.out.println("msg1 " + msg.substring(2,3));
+           // System.out.println("msg2 " + msg.substring(2,4));
             int courseNum = Integer.parseInt(msg.substring(2));
+           // System.out.println("courseNum" + courseNum);
             switch (opCode) {
                 case 5:
                     Message courseReg = new CourseReg(opCode, courseNum);
@@ -158,9 +145,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         return null;
     }
 
-
-
-    @Override
     public byte[] encode(Message message) {
         short opCodeMsg;
         String string="";
@@ -185,7 +169,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                 bytesToClient = mergeBytes(bytesToClient, string.getBytes());
 
             }
-
         }
         else if(message instanceof Error){
             opCodeArr = shortToBytes(opCodeErr);

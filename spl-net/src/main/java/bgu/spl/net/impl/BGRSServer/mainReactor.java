@@ -12,6 +12,7 @@ public class mainReactor {
     public static void main(String[] args){
 
         Database database= Database.getInstance();
+        database.initialize("/.Courses.txt");
 
         try(Server<Message> srv = Server.reactor(Integer.parseInt(args[1]), Integer.parseInt(args[0]),() -> new MessagingProtocolImpl(), () -> new MessageEncoderDecoderImpl()))
         {
@@ -21,7 +22,6 @@ public class mainReactor {
             System.out.println("IOException in mainTpc");
         }
 
-        database.initialize("/.Courses.txt");
 
     }
 }
