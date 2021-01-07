@@ -7,6 +7,7 @@ import bgu.spl.net.impl.DataObjects.Student;
 import bgu.spl.net.impl.DataObjects.User;
 import bgu.spl.net.impl.Message.Error;
 import bgu.spl.net.impl.Message.Ack;
+import bgu.spl.net.impl.Message.KdamCheck;
 import bgu.spl.net.impl.Message.Message;
 
 
@@ -69,14 +70,16 @@ public class Database {
             }
 
             while (line != null) {
-                String[] lineArr = line.split("|");
+                String[] lineArr = line.split("\\|");
                 int courseNum = Integer.parseInt(lineArr[0]);
                 String courseName = lineArr[1];
                 LinkedList<Course> kdamCourseList = new LinkedList<Course>();
-                String[] kdamCourseArr = lineArr[3].split(",");
+                String[] kdamCourseArr = lineArr[2].substring(1,lineArr[2].length()-1).split(",");
+                if(kdamCourseArr[0]=="")
+                    kdamCourseArr = new String[0];
                 for (int i = 0; i < kdamCourseArr.length; i++) {
                     int kdamCourseNum = Integer.parseInt(kdamCourseArr[i]);
-                    Course course = allCourses.get(kdamCourseNum);
+                    Course course = findCourse(kdamCourseNum);
                     kdamCourseList.add(course);
                 //TODO:check if it's possibbole that there is course that wasnt registered yet
                 }
@@ -147,7 +150,7 @@ public class Database {
         Course course = null;
         for (int i = 0; i < allCourses.size() && !courseIsExist; i++) {
             course = allCourses.get(i);
-            if (course.equals(courseNum)) {
+            if (course.getCourseNum()==courseNum) {
                 courseIsExist = true;
             }
         }
@@ -197,6 +200,7 @@ public class Database {
     }
 
     public Message courseReg(String userName, int courseNum) {
+        System.out.println("im in coursereg in dataBse");
         int opCode = 5;
         Course course = findCourse(courseNum);
         Student student = null;
@@ -237,28 +241,40 @@ public class Database {
         Course course = findCourse(courseNumber);
         LinkedList<Course> courseList = student.getCoursesList();
         LinkedList<Course> kdamCourseList = course.getKdamCourseList();
-        boolean found = false;
+        boolean studentDoneThisCourse = false;
         boolean allKdamDone = true;
-        int i = 0;
-        int j = 0;
-        while (i < courseList.size()) {
-            while (j < kdamCourseList.size() && !found && allKdamDone) {
+        for (int i=0;i< courseList.size();i++){
+            for(int j = 0;j<kdamCourseList.size() && !studentDoneThisCourse && allKdamDone;j++){
                 boolean isEquals = courseList.get(i).equals(kdamCourseList.get(j));
-                if (isEquals) {
-                    found = true;
-                    j++;
+                if(!isEquals)
+                    studentDoneThisCourse=false;
+                else
+                    studentDoneThisCourse=true;
+
+                if((i == courseList.size() - 1)) {
+                    if (isEquals)
+                        allKdamDone = true;
+                    else
+                        allKdamDone = false;
                 }
-                if (isEquals && (i == courseList.size() - 1))
-                    allKdamDone = false;
-
-                i++;
             }
-            found = false;
-        }
-        if (!allKdamDone)
-            return new Error(opCode);
+            studentDoneThisCourse=false;
 
+        }
+
+        if (!allKdamDone) {
+            return new Error(opCode);
+        }
         return new Ack(opCode);
+    }
+
+    public Message kdamCheck(int courseNumber){
+        int opCode=6;
+        Course currCurse=findCourse(courseNumber);
+        LinkedList<Course> kdam = currCurse.getKdamCourseList();
+            return new KdamCheck(opCode, courseNumber,kdam);
+
+
     }
 
     public Message courseStat(int courseNumber) {

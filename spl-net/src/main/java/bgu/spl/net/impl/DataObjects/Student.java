@@ -8,6 +8,7 @@ public class Student extends User{
 
     public Student(String userName, String password) {
         super(userName, password);
+        coursesList = new LinkedList<Course>();
     }
 
     public LinkedList<Course> getCoursesList() {

@@ -6,7 +6,7 @@ import bgu.spl.net.impl.Message.*;
 public class MessagingProtocolImpl implements MessagingProtocol<Message>{
 
     private Database myData = Database.getInstance();
-    private String myUser= null;
+    private static String myUser= null;
     private Message response = null;
     private boolean shouldTerminate = false;
 
@@ -31,8 +31,8 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
                 case 3:
                     userName = ((LogIn)msg).getUserName();
                     password = ((LogIn)msg).getPassword();
-                    response = myData.logIn(userName,password);
                     myUser = userName;
+                    response = myData.logIn(userName,password);
                     break;
             }
         }
@@ -47,7 +47,8 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
            switch(opCode){
                 case 5:
                     courseNum = ((CourseReg)msg).getCourseNum();
-                    response = myData.courseReg(myUser,courseNum);//todo: check when test if myuser is not null
+                    response = myData.courseReg(myUser,courseNum);
+                    System.out.println("there is a response");
                     break;
                 case 6:
                     courseNum = ((KdamCheck)msg).getCourseNum();
@@ -84,7 +85,9 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
         }
 
 
-
+        if(response ==null){
+            System.out.println("response is null");
+        }
         return response;
     }
 

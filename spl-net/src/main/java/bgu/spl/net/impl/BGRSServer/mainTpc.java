@@ -13,7 +13,7 @@ public class mainTpc {
 
     public static void main(String[] args){
         Database database= Database.getInstance();
-        database.initialize("./Courses.txt");
+        database.initialize("/home/spl211/Documents/spl211/SPL211/ass3/spl-net/Courses .txt");
 
         try(Server<Message> srv = Server.threadPerClient(Integer.parseInt(args[0]), () -> new MessagingProtocolImpl(), () -> new MessageEncoderDecoderImpl())){
             srv.serve();

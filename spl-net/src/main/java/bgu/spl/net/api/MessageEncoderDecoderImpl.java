@@ -1,10 +1,13 @@
 package bgu.spl.net.api;
 
-import bgu.spl.net.impl.Message.*;
+import bgu.spl.net.impl.DataObjects.Course;
+import bgu.spl.net.impl.Database;
 import bgu.spl.net.impl.Message.Error;
+import bgu.spl.net.impl.Message.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.LinkedList;
 
 public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message> {
 
@@ -13,8 +16,8 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     short opCode;
     int fullOpcode = 0;
     int zeroCounter = 0;
-    int bytesCounter = 0;
     byte[] twoFirstBytes = new byte[2];
+    private Database myData = Database.getInstance();
 
 
 
@@ -23,6 +26,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
 
         String msgAsStr = "";
         pushByte(nextByte);
+        System.out.println("nextByte " + nextByte);
 
         //read the opcode
         if (fullOpcode == 0) {
@@ -63,7 +67,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                 }
                // bytesCounter++;
             } else if (opCode == 5 || opCode == 6 || opCode == 7 || opCode == 9 || opCode == 10 ) {
-                System.out.println("in else if");
                 if (len == 4) {
                     msgAsStr = popString();
                     System.out.println(msgAsStr);
@@ -109,16 +112,16 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             Message logOut = new LogOut(opCode);
             return logOut;
         } else if (opCode == 5 || opCode == 6 || opCode == 7 || opCode == 9 || opCode == 10) {
-            //System.out.println("msg1 " + msg.substring(2,3));
-           // System.out.println("msg2 " + msg.substring(2,4));
             int courseNum = Integer.parseInt(msg.substring(2));
-           // System.out.println("courseNum" + courseNum);
+            System.out.println("courseNum" + courseNum);
             switch (opCode) {
                 case 5:
                     Message courseReg = new CourseReg(opCode, courseNum);
+                    System.out.println("returned courseReg");
                     return courseReg;
                 case 6:
-                    Message kdamCheck = new KdamCheck(opCode, courseNum);
+                    LinkedList<Course> kdam= myData.findCourse(courseNum).getKdamCourseList();
+                    Message kdamCheck = new KdamCheck(opCode, courseNum,kdam);
                     return kdamCheck;
                 case 7:
                     Message courseStat = new CourseStat(opCode, courseNum);
