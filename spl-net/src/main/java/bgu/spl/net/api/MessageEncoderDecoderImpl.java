@@ -39,7 +39,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             fullOpcode++;
            // bytesCounter++;
         }
-      else if (fullOpcode == 2) {
+      /*else*/ if (fullOpcode == 2) {//TODO: CHECK IF DELETET THE ELSE DOESNT ROUING
             opCode = bytesToShort(twoFirstBytes);
             System.out.println("opCode" + opCode);
 
@@ -53,12 +53,15 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                     zeroCounter++;
                 }
             } else if (opCode == 8 || opCode == 12) {
-                if (zeroCounter == 1) {
+                if (nextByte=='\0') {
                     msgAsStr = popString();
+                    //zeroCounter++;
                     return strToMsg(opCode, msgAsStr);
                 }
-                if (nextByte == '\0')
-                    zeroCounter++;
+               // if (nextByte == '\0') {
+                  //  zeroCounter++;
+               // }
+               // if (nextByte == '\0')
             } else if (opCode == 4 || opCode == 11) {
                 if (len == 2) {
                     msgAsStr = popString();
@@ -131,10 +134,10 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                     return unRegister;
             }
         }else if(opCode==8){
-            counter=0;
-            while(msg.charAt(counter)!='0' && counter<msg.length())
-                counter ++;
-            userName = msg.substring(2,counter);
+            counter=2;
+            while (counter < msg.length() && msg.charAt(counter) != '\0' )
+                counter++;
+            userName = msg.substring(2, counter);
             Message studentStat = new StudentStat(opCode, userName);
             return studentStat;
         }
@@ -168,6 +171,10 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                 string = string + ((Ack) message).getData() +'\0';
                 bytesToClient = mergeBytes(bytesToClient, string.getBytes());
 
+            }
+            if(opCode==11){
+                string = string + ((Ack) message).getStrMyCourses() +'\0';
+                bytesToClient = mergeBytes(bytesToClient, string.getBytes());
             }
         }
         else if(message instanceof Error){

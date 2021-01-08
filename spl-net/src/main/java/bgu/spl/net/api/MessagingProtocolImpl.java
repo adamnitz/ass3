@@ -3,6 +3,8 @@ package bgu.spl.net.api;
 import bgu.spl.net.impl.Database;
 import bgu.spl.net.impl.Message.*;
 
+import javax.swing.*;
+
 public class MessagingProtocolImpl implements MessagingProtocol<Message>{
 
     private Database myData = Database.getInstance();
@@ -40,38 +42,40 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
             shouldTerminate=true;
         }
 
-       if(opCode == 5||opCode == 6||opCode == 7||opCode == 9||opCode == 10){
-         int courseNum;
-           switch(opCode){
-                case 5:
-                    courseNum = ((CourseReg)msg).getCourseNum();
-                    response = myData.courseReg(myUser,courseNum);
-                    break;
-                case 6:
-                    courseNum = ((KdamCheck)msg).getCourseNum();
-                    response = myData.kdamCheck(myUser,courseNum);
-                    break;
-                case 7:
-                    courseNum = ((CourseStat)msg).getCourseNum();
-                    response = myData.courseStat(courseNum);
-                    break;
-                case 9:
-                    courseNum = ((IsRegistered)msg).getCourseNum();
-                    response = myData.isRegistered(myUser,courseNum);
-                    break;
-                case 10:
-                    courseNum = ((UnRegister)msg).getCourseNum();
-                    response =myData.unRegister(myUser,courseNum);
-                    break;
-            }
+       if(opCode == 5||opCode == 6||opCode == 7||opCode == 9||opCode == 10) {
+           int courseNum;
+           switch (opCode) {
+               case 5:
+                   courseNum = ((CourseReg) msg).getCourseNum();
+                   response = myData.courseReg(myUser, courseNum);
+                   break;
+               case 6:
+                   courseNum = ((KdamCheck) msg).getCourseNum();
+                   response = myData.kdamCheck(myUser, courseNum);
+                   break;
+               case 7:
+                   courseNum = ((CourseStat) msg).getCourseNum();
+                   response = myData.courseStat(courseNum);
+                   break;
+               case 9:
+                   courseNum = ((IsRegistered) msg).getCourseNum();
+                   response = myData.isRegistered(myUser, courseNum);
+                   break;
+               case 10:
+                   courseNum = ((UnRegister) msg).getCourseNum();
+                   response = myData.unRegister(myUser, courseNum);
+                   break;
+           }
+       }
 
           if(opCode==8){
               userName = ((StudentStat)msg).getUserName();
               response = myData.studentStat(userName);
               }
-          }
+
           if(opCode==11){
               response = myData.myCourses(myUser);
+              System.out.println(response+"msg encdnc 78");
           }
 
         return response;

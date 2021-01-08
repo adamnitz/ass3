@@ -11,6 +11,7 @@ import bgu.spl.net.impl.Message.KdamCheck;
 import bgu.spl.net.impl.Message.Message;
 
 
+import javax.swing.text.DefaultStyledDocument;
 import java.io.*;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -311,20 +312,17 @@ public class Database {
 
     public Message studentStat(String userName) {
         int opCode = 8;
-        String string = userName + "|";
+        //String string = userName + "|";
         Student student = findStudent(userName);
-        LinkedList<Course> courses = student.getCoursesList();
+        String courses = student.getStringCoursesList();
+
         Ack ack = new Ack(opCode);
 
-        if (courses.isEmpty()) {
-            string = string + "[]";
-            ack.setData(string);
-        }
+        String string = "Student: " + userName + '\n' +  "Courses: " + courses;
+        System.out.println("ackData" + string);
 
-        for (int i = 0; i < courses.size(); i++) {
-            string = string + courses.get(i).getCourseNum() + ",";
-        }
         ack.setData(string);
+        System.out.println("ackData" + ack.getData());
         return ack;
     }
 
@@ -332,15 +330,20 @@ public class Database {
         int opCode = 9;
         Ack ack = new Ack(opCode);
         Course course = findCourse(courseNum);
+        boolean found = false;
         if (course != null) {
             LinkedList<String> registeredStudents = course.getRegisteredStudent();
-            for (int i = 0; i < registeredStudents.size(); i++) {
+            for (int i = 0; i < registeredStudents.size() && !found; i++) {
                 if (registeredStudents.get(i).equals(userName)) {
                     ack.setData("REGISTERD");
+                    found = true;
                 }
             }
+
         }
-        ack.setData("NOT REGISTERED");
+        if(!found)
+            ack.setData("NOT REGISTERED");
+
         return ack;
     }
 
@@ -379,12 +382,14 @@ public class Database {
         Student student = findStudent(userName);
         if (student != null) {
             LinkedList<Course> courses = student.getCoursesList();
-            LinkedList<Integer> myCourses = null;
+            courses = sortByCoursList(courses);
+          //  LinkedList<Integer> myCourses = new LinkedList<Integer>();
 
-            for (int i = 0; i < courses.size(); i++) {
+           /* for (int i = 0; i < courses.size(); i++) {
                 myCourses.add(courses.get(i).getCourseNum());
-            }
-            ack.setMyCourses(myCourses);
+            }*/
+
+            ack.setMyCourses(courses);
             return ack;
         }
         return new Error(opCode);
@@ -393,17 +398,18 @@ public class Database {
     public  LinkedList<Course> sortByCoursList( LinkedList<Course> kdamCourses){
 
         int len=kdamCourses.size();
+        int []tmp=new int[len];
         int[][]array=new int [2][len];
         int i=0;
         for(int k=0;k<len;k++){
-
             int kdamcurr=kdamCourses.get(k).getCourseNum();
             array[i][k]=kdamcurr;
             int ind=findCourse(kdamcurr).getIndex();
             array[i+1][k]=ind;
+            tmp[k]=ind;
         }
         boolean found=false;
-        int[] tmp=array[1];
+
         Arrays.sort(tmp);
         int [] sortcourse=new int[len];
         for(int b=0;b<len;b++){
@@ -411,7 +417,7 @@ public class Database {
             for (int j=0;j<len&& !found;j++){
 
                 if(tmp[b]==array[1][j]) {
-                    sortcourse[j] = array[0][j];
+                    sortcourse[b] = array[0][j];
                     found = true;
                 }
             }
