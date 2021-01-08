@@ -57,6 +57,8 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
                    response = myData.courseReg(myUser, courseNum,myUser);
                    break;
                case 6:
+                   if (msg instanceof Error)
+                       return msg;
                    courseNum = ((KdamCheck) msg).getCourseNum();
                    response = myData.kdamCheck(myUser, courseNum, myUser);
                    break;

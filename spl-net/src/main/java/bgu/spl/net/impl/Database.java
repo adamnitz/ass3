@@ -110,12 +110,11 @@ public class Database {
     public Message adminReg(String userName, String password) {
         int opCode = 1;
         boolean isExist = false;
-        //TODO:think if it's work because of the instanceOf
         for (int i = 0; i < allUsers.size() && !isExist; i++) {
-            if (allUsers.get(i) instanceof Admin) {
+       //     if (allUsers.get(i) instanceof Admin) {
                 if (allUsers.get(i).getUserName().equals(userName))
                     isExist = true;
-            }
+          //  }
         }
         if (isExist) {
             return new Error(opCode);
@@ -174,7 +173,7 @@ public class Database {
 
     public Message studentReg(String userName, String password) {
         int opCode = 2;
-        if (findStudent(userName) != null)
+        if (findUser(userName) != null)
             return new Error(opCode);
 
         else {
@@ -263,12 +262,14 @@ public class Database {
         }
         Student student = findStudent(userName);
         Course course = findCourse(courseNumber);
+        if(course ==null)
+            return new Error(opCode);
         LinkedList<Course> courseList = student.getCoursesList();
         LinkedList<Course> kdamCourseList = course.getKdamCourseList();
         boolean studentDoneThisCourse = false;
         boolean allKdamDone = true;
-        boolean finish=false;
-        for (int i=0;i< courseList.size()&& !finish;i++){
+        boolean notfinish=false;
+        for (int i=0;i< courseList.size()&& !notfinish;i++){
             for(int j = 0;j<kdamCourseList.size() && !studentDoneThisCourse && allKdamDone;j++){
                 boolean isEquals = courseList.get(i).equals(kdamCourseList.get(j));
                 if(!isEquals)
@@ -276,13 +277,15 @@ public class Database {
                 else {
                     if (j == kdamCourseList.size() - 1) {
                         allKdamDone = true;
-                        finish = true;
+                        notfinish = true;
                     }
                     studentDoneThisCourse = true;
                 }
                 if((i == courseList.size() - 1)) {
-                    if (isEquals)
+                    if (isEquals) {
                         allKdamDone = true;
+                        notfinish = true;
+                    }
                     else
                         allKdamDone = false;
                 }
@@ -291,9 +294,11 @@ public class Database {
 
         }
 
-        if (!allKdamDone) {
+        if (!allKdamDone ) {
             return new Error(opCode);
         }
+        if(notfinish)
+            return new Error(opCode);
 
         Ack ack = new Ack(opCode);
         ack.setKdamCourses(kdamCourseList);
@@ -338,10 +343,16 @@ public class Database {
         if(user instanceof Student){
             return new Error(opCode);
         }
+
+        if( findUser(userName) instanceof Admin)
+            return new Error(opCode);
+
         Student student = findStudent(userName);
+
         if(student == null){
             return new Error(opCode);
         }
+
         String courses = student.getStringCoursesList();
 
         Ack ack = new Ack(opCode);
@@ -445,12 +456,13 @@ public class Database {
         int []tmp=new int[len];
         int[][]array=new int [2][len];
         int i=0;
-        for(int k=0;k<len;k++){
-            int kdamcurr=kdamCourses.get(k).getCourseNum();
-            array[i][k]=kdamcurr;
-            int ind=findCourse(kdamcurr).getIndex();
-            array[i+1][k]=ind;
-            tmp[k]=ind;
+        for(int k=0;k<len;k++) {
+            int kdamcurr = kdamCourses.get(k).getCourseNum();
+            array[i][k] = kdamcurr;
+            int ind = findCourse(kdamcurr).getIndex();
+            array[i + 1][k] = ind;
+            tmp[k] = ind;
+
         }
         boolean found=false;
 

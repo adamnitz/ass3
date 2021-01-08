@@ -120,6 +120,8 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                     Message courseReg = new CourseReg(opCode, courseNum);
                     return courseReg;
                 case 6:
+                    if (myData.findCourse(courseNum) == null)
+                        return new Error(opCode);
                     LinkedList<Course> kdam= myData.findCourse(courseNum).getKdamCourseList();
                     Message kdamCheck = new KdamCheck(opCode, courseNum,kdam);
                     return kdamCheck;
