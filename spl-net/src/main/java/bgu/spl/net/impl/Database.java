@@ -135,6 +135,9 @@ public class Database {
             if (user.getUserName().equals(userName))
                 isExist = true;
         }
+
+        if (isExist == false)
+            user = null;
         return user;
     }
 
@@ -149,6 +152,9 @@ public class Database {
                     isExist = true;
             }
         }
+        if (isExist == false)
+            student = null;
+
         return student;
     }
 
@@ -161,6 +167,8 @@ public class Database {
                 courseIsExist = true;
             }
         }
+        if(courseIsExist == false)
+            course = null;
         return course;
     }
 
@@ -206,9 +214,10 @@ public class Database {
         return new Error(opCode);
     }
 
-    public Message courseReg(String userName, int courseNum) {
-        System.out.println("im in coursereg in dataBse");
+    public Message courseReg(String userName, int courseNum, String myUser) {
         int opCode = 5;
+        if(myUser == null)
+            return new Error(opCode);
         Course course = findCourse(courseNum);
         Student student = null;
 
@@ -232,8 +241,10 @@ public class Database {
                 }
             }
         }
+        if (student == null)
+            return new Error(opCode);
 
-        if (kdamCheck(userName, courseNum) instanceof Error)
+        if (kdamCheck(userName, courseNum, myUser) instanceof Error)
             return new Error(opCode);
 
         student.addCourse(course);
@@ -242,8 +253,14 @@ public class Database {
 
     }
 
-    public Message kdamCheck(String userName, int courseNumber) {
+    public Message kdamCheck(String userName, int courseNumber,String myUser) {
         int opCode = 6;
+        if(myUser == null)
+            return new Error(opCode);
+        User user = findUser(myUser);
+        if(user instanceof Admin){
+            return new Error(opCode);
+        }
         Student student = findStudent(userName);
         Course course = findCourse(courseNumber);
         LinkedList<Course> courseList = student.getCoursesList();
@@ -283,17 +300,19 @@ public class Database {
         return ack;
     }
 
-   /* public Message kdamCheck(int courseNumber){
-        int opCode=6;
-        Course currCurse=findCourse(courseNumber);
-        LinkedList<Course> kdam = currCurse.getKdamCourseList();
 
-        return new KdamCheck(opCode, courseNumber,kdam);
-    }*/
-
-    public Message courseStat(int courseNumber) {
+    public Message courseStat(int courseNumber, String myUser) {
         int opCode=7;
+        if(myUser == null)
+            return new Error(opCode);
         Course course = findCourse(courseNumber);
+        if(course == null){
+            return new Error(opCode);
+        }
+        User user = findUser(myUser);
+        if(user instanceof Student){
+            return new Error(opCode);
+        }
         int courseNum = course.getCourseNum();
         String courseName = course.getCourseName();
         int availableSeats = course.getNumOfMaxStudent() - course.getNumOfRegisteredStudent();
@@ -310,10 +329,19 @@ public class Database {
         return ack;
     }
 
-    public Message studentStat(String userName) {
+    public Message studentStat(String userName, String myUser) {
         int opCode = 8;
+        if(myUser == null)
+            return new Error(opCode);
         //String string = userName + "|";
+        User user = findUser(myUser);
+        if(user instanceof Student){
+            return new Error(opCode);
+        }
         Student student = findStudent(userName);
+        if(student == null){
+            return new Error(opCode);
+        }
         String courses = student.getStringCoursesList();
 
         Ack ack = new Ack(opCode);
@@ -326,8 +354,12 @@ public class Database {
         return ack;
     }
 
-    public Ack isRegistered(String userName, int courseNum) {
+    public Message isRegistered(String userName, int courseNum,String myUser) {
         int opCode = 9;
+        User user = findUser(myUser);
+        if(user instanceof Admin){
+            return new Error(opCode);
+        }
         Ack ack = new Ack(opCode);
         Course course = findCourse(courseNum);
         boolean found = false;
@@ -347,8 +379,14 @@ public class Database {
         return ack;
     }
 
-    public Message unRegister(String userName, int courseNum) {
+    public Message unRegister(String userName, int courseNum,String myUser) {
         int opCode = 10;
+        if(myUser == null)
+            return new Error(opCode);
+        User user = findUser(myUser);
+        if(user instanceof Admin){
+            return new Error(opCode);
+        }
         Course course = findCourse(courseNum);
         Student student = findStudent(userName);
 
@@ -376,8 +414,14 @@ public class Database {
 
     }
 
-    public Message myCourses(String userName) {
+    public Message myCourses(String userName,String myUser) {
         int opCode=11;
+        if(myUser == null)
+            return new Error(opCode);
+        User user = findUser(myUser);
+        if(user instanceof Admin){
+            return new Error(opCode);
+        }
         Ack ack = new Ack(11);
         Student student = findStudent(userName);
         if (student != null) {

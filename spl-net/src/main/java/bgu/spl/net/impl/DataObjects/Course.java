@@ -68,7 +68,7 @@ public class Course {
         if(str.length()>1)
             str = str.substring(0,str.length()-1) + "]";
         else
-            str = "]";
+            str = str + "]";
 
         return str;
     }
