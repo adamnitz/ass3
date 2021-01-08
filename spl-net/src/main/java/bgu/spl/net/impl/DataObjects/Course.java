@@ -13,15 +13,26 @@ public class Course {
     private LinkedList<Course> kdamCourseList;
     private int numOfMaxStudent;
     private int numOfRegisteredStudent;
-    LinkedList<String> registeredStudent;
+    private LinkedList<String> registeredStudent;
+    private int index;
 
-    public Course(int courseNum,String courseName,LinkedList<Course> kdamCourseList, int numOfMaxStudent){
+
+
+    public Course(int courseNum, String courseName, LinkedList<Course> kdamCourseList, int numOfMaxStudent, int index){
         this.courseNum = courseNum;
         this.courseName = courseName;
         this.kdamCourseList = kdamCourseList;
         this.numOfMaxStudent = numOfMaxStudent;
         this.numOfRegisteredStudent = 0;
-        registeredStudent = new LinkedList<String>();
+        this.registeredStudent = new LinkedList<String>();
+        this.index=index;
+    }
+    public void setKdamCourseList(LinkedList<Course> kdamCourseList) {
+        this.kdamCourseList = kdamCourseList;
+    }
+
+    public int getIndex() {
+        return index;
     }
 
     public int getCourseNum() {
@@ -46,6 +57,20 @@ public class Course {
 
     public LinkedList<String> getRegisteredStudent() {
         return registeredStudent;
+    }
+
+    public String getStringRegisteredStudent() {
+        String str ="[";
+        for(int i=0; i<registeredStudent.size(); i++){
+            str = str+registeredStudent.get(i)+",";
+        }
+
+        if(str.length()>1)
+            str = str.substring(0,str.length()-1) + "]";
+        else
+            str = "]";
+
+        return str;
     }
 
     public Message addNumOfRegisteredStudent(int opCode){

@@ -12,6 +12,7 @@ import bgu.spl.net.impl.Message.Message;
 
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Vector;
 
@@ -25,7 +26,7 @@ import java.util.Vector;
  */
 public class Database {
 
-    private final Vector<Course> allCourses;
+    private Vector<Course> allCourses;
     private final Vector<User> allUsers;
 
     private static class DataHolder {
@@ -68,7 +69,7 @@ public class Database {
             } catch (IOException e) {
                 return false;
             }
-
+            int index=0;
             while (line != null) {
                 String[] lineArr = line.split("\\|");
                 int courseNum = Integer.parseInt(lineArr[0]);
@@ -83,20 +84,24 @@ public class Database {
                     kdamCourseList.add(course);
                 //TODO:check if it's possibbole that there is course that wasnt registered yet
                 }
+
             int numOfMaxStudents = Integer.parseInt(lineArr[3]);
-            Course course = new Course(courseNum, courseName, kdamCourseList, numOfMaxStudents);
+            Course course = new Course(courseNum, courseName, kdamCourseList, numOfMaxStudents,index);
+            course.setKdamCourseList(sortByCoursList(course.getKdamCourseList()));
             allCourses.add(course);
+
             try {
                 line = in.readLine();
             } catch (IOException e) {
                 return false;
             }
-
+         index++;
         }
     }
         catch (FileNotFoundException e) {
                 System.out.print("The File not found");
         }
+
         return true;
     }
 
@@ -291,21 +296,14 @@ public class Database {
         int courseNum = course.getCourseNum();
         String courseName = course.getCourseName();
         int availableSeats = course.getNumOfMaxStudent() - course.getNumOfRegisteredStudent();
-        LinkedList<String> listOfStudent = course.getRegisteredStudent();
+        String listOfStudent = course.getStringRegisteredStudent();
         Ack ack = new Ack(opCode);
 
-        String string = courseNum + "|" + courseName + "|" + availableSeats + "/" + course.getNumOfMaxStudent() +
-                "|";
-        if (listOfStudent.isEmpty()) {
-            string = string + "[]";
-            ack.setData(string);
-        }
+        String string = "Course:" + "("+courseNum+")" + courseName + '\n' + "seatsAvailable: " +
+                availableSeats + "/" + course.getNumOfMaxStudent()+ '\n' + "Students Registered: " + listOfStudent;
+        //String string = courseNum + "|" + courseName + "|" + availableSeats + "/" + course.getNumOfMaxStudent() +
+          //      "|" + listOfStudent;
 
-        String[] arr = new String[listOfStudent.size()];
-        for (int i = 0; i < listOfStudent.size(); i++) {
-            arr[i] = listOfStudent.get(i);
-        }
-        string = string + arr.toString();
         ack.setData(string);
 
         return ack;
@@ -390,5 +388,38 @@ public class Database {
             return ack;
         }
         return new Error(opCode);
+    }
+
+    public  LinkedList<Course> sortByCoursList( LinkedList<Course> kdamCourses){
+
+        int len=kdamCourses.size();
+        int[][]array=new int [2][len];
+        int i=0;
+        for(int k=0;k<len;k++){
+
+            int kdamcurr=kdamCourses.get(k).getCourseNum();
+            array[i][k]=kdamcurr;
+            int ind=findCourse(kdamcurr).getIndex();
+            array[i+1][k]=ind;
+        }
+        boolean found=false;
+        int[] tmp=array[1];
+        Arrays.sort(tmp);
+        int [] sortcourse=new int[len];
+        for(int b=0;b<len;b++){
+            found=false;
+            for (int j=0;j<len&& !found;j++){
+
+                if(tmp[b]==array[1][j]) {
+                    sortcourse[j] = array[0][j];
+                    found = true;
+                }
+            }
+        }
+        LinkedList<Course> ans=new LinkedList<Course>();
+        for(int x=0;x<len;x++)
+            ans.add(findCourse(sortcourse[x]));
+
+        return ans;
     }
 }
