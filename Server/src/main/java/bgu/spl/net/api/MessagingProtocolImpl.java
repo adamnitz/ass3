@@ -9,7 +9,7 @@ import javax.swing.*;
 public class MessagingProtocolImpl implements MessagingProtocol<Message>{
 
     private Database myData = Database.getInstance();
-    private /*static*/ String myUser= null;
+    private String myUser= null;
     private Message response = null;
     private boolean shouldTerminate = false;
 
@@ -40,7 +40,6 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
                         response = myData.logIn(userName,password);
                        if(response instanceof Ack){
                            myUser = userName;
-
                        }
                     }
                     else
@@ -51,46 +50,72 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
         }
 
         if(opCode==4){
-            response = myData.logOut(myUser);
-            shouldTerminate=true;
+            if(myUser!=null) {
+                response = myData.logOut(myUser);
+                shouldTerminate = true;
+            }
+            else
+                response = new Error(opCode);
         }
 
        if(opCode == 5||opCode == 6||opCode == 7||opCode == 9||opCode == 10) {
            int courseNum;
            switch (opCode) {
                case 5:
-                   courseNum = ((CourseReg) msg).getCourseNum();
-                   response = myData.courseReg(myUser, courseNum,myUser);
+                   if(myUser!=null) {
+                       courseNum = ((CourseReg) msg).getCourseNum();
+                       response = myData.courseReg(myUser, courseNum, myUser);
+                   }
+                   else
+                       return new Error(opCode);
                    break;
                case 6:
                    if (msg instanceof Error)
                        return msg;
-                   courseNum = ((KdamCheck) msg).getCourseNum();
-                   response = myData.kdamCheck(myUser, courseNum, myUser);
+                   if(myUser!=null) {
+                       courseNum = ((KdamCheck) msg).getCourseNum();
+                       response = myData.kdamCheck(myUser, courseNum, myUser);
+                   }
+                   else
+                       return new Error(opCode);
                    break;
                case 7:
                    courseNum = ((CourseStat) msg).getCourseNum();
                    response = myData.courseStat(courseNum, myUser);
                    break;
                case 9:
-                   courseNum = ((IsRegistered) msg).getCourseNum();
-                   response = myData.isRegistered(myUser, courseNum,myUser);
+                   if(myUser!=null) {
+                       courseNum = ((IsRegistered) msg).getCourseNum();
+                       response = myData.isRegistered(myUser, courseNum, myUser);
+                   }
+                   else
+                       return new Error(opCode);
                    break;
                case 10:
-                   courseNum = ((UnRegister) msg).getCourseNum();
-                   response = myData.unRegister(myUser, courseNum,myUser);
+                   if(myUser!=null) {
+                       courseNum = ((UnRegister) msg).getCourseNum();
+                       response = myData.unRegister(myUser, courseNum, myUser);
+                   }
+                   else
+                       return new Error(opCode);
                    break;
            }
        }
 
           if(opCode==8){
+              if(myUser!=null){
               userName = ((StudentStat)msg).getUserName();
               response = myData.studentStat(userName, myUser);
               }
+              else
+                  return new Error(opCode);
+              }
 
           if(opCode==11){
-              response = myData.myCourses(myUser, myUser);
-              System.out.println(response+"msg encdnc 78");
+              if(myUser!=null)
+                 response = myData.myCourses(myUser, myUser);
+              else
+                  return new Error(opCode);
           }
 
         return response;

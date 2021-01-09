@@ -25,7 +25,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
     public Message decodeNextByte(byte nextByte) {
 
         String msgAsStr = "";
-        pushByte(nextByte);
 
         //read the opcode
         if (fullOpcode == 0) {
@@ -66,6 +65,8 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             }
 
         }
+
+        pushByte(nextByte);
         return null;
 
     }
