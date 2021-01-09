@@ -213,7 +213,7 @@ public class Database {
         return new Error(opCode);
     }
 
-    public Message courseReg(String userName, int courseNum, String myUser) {
+    public synchronized Message courseReg(String userName, int courseNum, String myUser) {
         int opCode = 5;
         if(myUser == null)
             return new Error(opCode);
@@ -397,7 +397,7 @@ public class Database {
         return ack;
     }
 
-    public Message unRegister(String userName, int courseNum,String myUser) {
+    public synchronized Message unRegister(String userName, int courseNum,String myUser) {
         int opCode = 10;
         if(myUser == null)
             return new Error(opCode);

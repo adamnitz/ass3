@@ -12,14 +12,14 @@ public class mainReactor {
     public static void main(String[] args){
 
         Database database= Database.getInstance();
-        database.initialize("/.Courses.txt");
+        database.initialize("/home/spl211/Documents/spl211/SPL211/ass3/spl-net/Courses .txt");
 
         try(Server<Message> srv = Server.reactor(Integer.parseInt(args[1]), Integer.parseInt(args[0]),() -> new MessagingProtocolImpl(), () -> new MessageEncoderDecoderImpl()))
         {
             srv.serve();
         }
         catch (IOException e) {
-            System.out.println("IOException in mainTpc");
+            System.out.println("IOException in mainReactor");
         }
 
 
