@@ -75,9 +75,9 @@ public class Database {
                 String[] lineArr = line.split("\\|");
                 int courseNum = Integer.parseInt(lineArr[0]);
                 String courseName = lineArr[1];
-                LinkedList<Course> kdamCourseList = new LinkedList<Course>();
+                LinkedList<Course> kdamCourseList = new LinkedList<>();
                 String[] kdamCourseArr = lineArr[2].substring(1,lineArr[2].length()-1).split(",");
-                if(kdamCourseArr[0]=="")
+                if(kdamCourseArr[0].equals(""))
                     kdamCourseArr = new String[0];
                 for (int i = 0; i < kdamCourseArr.length; i++) {
                     int kdamCourseNum = Integer.parseInt(kdamCourseArr[i]);
@@ -135,7 +135,7 @@ public class Database {
                 isExist = true;
         }
 
-        if (isExist == false)
+        if (!isExist)
             user = null;
         return user;
     }
@@ -151,7 +151,7 @@ public class Database {
                     isExist = true;
             }
         }
-        if (isExist == false)
+        if (!isExist)
             student = null;
 
         return student;
@@ -166,7 +166,7 @@ public class Database {
                 courseIsExist = true;
             }
         }
-        if(courseIsExist == false)
+        if(!courseIsExist)
             course = null;
         return course;
     }
@@ -226,14 +226,17 @@ public class Database {
         else if (course.getNumOfRegisteredStudent() >= course.getNumOfMaxStudent())
             return new Error(opCode);
 
-        for (int i = 0; i < allUsers.size(); i++) {
 
+        for (int i = 0; i < allUsers.size(); i++) {
             if (allUsers.get(i).getUserName().equals(userName)) {
                 if (allUsers.get(i) instanceof Admin) {
                     return new Error(opCode);
                 }
 
                 student = (Student) allUsers.get(i);
+
+                if(student.getCoursesList().contains(findCourse(courseNum)))
+                    return new Error(opCode);
 
                 if (!allUsers.get(i).isLogIn()) {
                     return new Error(opCode);
@@ -269,6 +272,8 @@ public class Database {
         boolean studentDoneThisCourse = false;
         boolean allKdamDone = true;
         boolean notfinish=false;
+
+
         for (int i=0;i< courseList.size()&& !notfinish;i++){
             for(int j = 0;j<kdamCourseList.size() && !studentDoneThisCourse && allKdamDone;j++){
                 boolean isEquals = courseList.get(i).equals(kdamCourseList.get(j));
@@ -373,17 +378,19 @@ public class Database {
         }
         Ack ack = new Ack(opCode);
         Course course = findCourse(courseNum);
+        if(course == null)
+            return new Error(opCode);
         boolean found = false;
-        if (course != null) {
-            LinkedList<String> registeredStudents = course.getRegisteredStudent();
-            for (int i = 0; i < registeredStudents.size() && !found; i++) {
-                if (registeredStudents.get(i).equals(userName)) {
-                    ack.setData("REGISTERD");
-                    found = true;
-                }
-            }
 
+        LinkedList<String> registeredStudents = course.getRegisteredStudent();
+        for (int i = 0; i < registeredStudents.size() && !found; i++) {
+            if (registeredStudents.get(i).equals(userName)) {
+                ack.setData("REGISTERD");
+                found = true;
+            }
         }
+
+
         if(!found)
             ack.setData("NOT REGISTERED");
 
@@ -478,7 +485,7 @@ public class Database {
                 }
             }
         }
-        LinkedList<Course> ans=new LinkedList<Course>();
+        LinkedList<Course> ans=new LinkedList<>();
         for(int x=0;x<len;x++)
             ans.add(findCourse(sortcourse[x]));
 

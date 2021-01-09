@@ -31,18 +31,13 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         if (fullOpcode == 0) {
             twoFirstBytes[0] = nextByte;
             fullOpcode++;
-           // bytesCounter++;
-
         }
         else if (fullOpcode == 1) {
             twoFirstBytes[1] = nextByte;
             fullOpcode++;
-           // bytesCounter++;
         }
       /*else*/ if (fullOpcode == 2) {//TODO: CHECK IF DELETET THE ELSE DOESNT ROUING
             opCode = bytesToShort(twoFirstBytes);
-            System.out.println("opCode" + opCode);
-
             if (opCode == 1 || opCode == 2 || opCode == 3) {
                 if (zeroCounter == 1 &&nextByte == '\0' ) {
                     msgAsStr = popString();
@@ -55,30 +50,22 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             } else if (opCode == 8 || opCode == 12) {
                 if (nextByte=='\0') {
                     msgAsStr = popString();
-                    //zeroCounter++;
                     return strToMsg(opCode, msgAsStr);
                 }
-               // if (nextByte == '\0') {
-                  //  zeroCounter++;
-               // }
-               // if (nextByte == '\0')
+
             } else if (opCode == 4 || opCode == 11) {
                 if (len == 2) {
                     msgAsStr = popString();
                     return strToMsg(opCode, msgAsStr);
                 }
-               // bytesCounter++;
             } else if (opCode == 5 || opCode == 6 || opCode == 7 || opCode == 9 || opCode == 10 ) {
-                if (len == 4) {
+                if (len == 4 ){
                     msgAsStr = popString();
                     return strToMsg(opCode, msgAsStr);
                 }
-               // bytesCounter++;
             }
 
         }
-        //pushByte(nextByte);
-        //bytesCounter++;
         return null;
 
     }
@@ -114,7 +101,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             return logOut;
         } else if (opCode == 5 || opCode == 6 || opCode == 7 || opCode == 9 || opCode == 10) {
             int courseNum = Integer.parseInt(msg.substring(2));
-            System.out.println("courseNum" + courseNum);
             switch (opCode) {
                 case 5:
                     Message courseReg = new CourseReg(opCode, courseNum);
@@ -162,7 +148,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         byte [] opCodeMsgArr;
         if(message instanceof Ack){
             opCodeArr = shortToBytes(opCodeAck);
-            opCodeMsg = (short)(((Ack) message).getOpCode());
+            opCodeMsg = (short)((message).getOpCode());
             opCodeMsgArr =  shortToBytes(opCodeMsg);
             bytesToClient = mergeBytes(opCodeArr, opCodeMsgArr);
             if(opCode == 6){
@@ -181,13 +167,12 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         }
         else if(message instanceof Error){
             opCodeArr = shortToBytes(opCodeErr);
-            opCodeMsg =  (short)(((Error) message).getOpCode());
+            opCodeMsg =  (short)(( message).getOpCode());
             opCodeMsgArr =  shortToBytes(opCodeMsg);
             bytesToClient = mergeBytes(opCodeArr, opCodeMsgArr);
         }
 
-        for(int i=0 ;i <bytesToClient.length; i++){
-        }
+
          return bytesToClient;
     }
 

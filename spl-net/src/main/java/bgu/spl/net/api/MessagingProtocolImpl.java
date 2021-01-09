@@ -34,8 +34,11 @@ public class MessagingProtocolImpl implements MessagingProtocol<Message>{
                     userName = ((LogIn)msg).getUserName();
                     password = ((LogIn)msg).getPassword();
                     if(myUser==null){
-                        myUser = userName;
                         response = myData.logIn(userName,password);
+                       if(response instanceof Ack){
+                           myUser = userName;
+
+                       }
                     }
                     else
                         response = new Error(opCode);
