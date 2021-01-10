@@ -23,8 +23,9 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
 
     @Override
     public Message decodeNextByte(byte nextByte) {
-
         String msgAsStr = "";
+        pushByte(nextByte);
+
 
         //read the opcode
         if (fullOpcode == 0) {
@@ -37,11 +38,15 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         }
       /*else*/ if (fullOpcode == 2) {//TODO: CHECK IF DELETET THE ELSE DOESNT ROUING
             opCode = bytesToShort(twoFirstBytes);
+            System.out.println("server got opcode: " + opCode);
+//            System.out.println("len: " + len);
             if (opCode == 1 || opCode == 2 || opCode == 3) {
                 if (zeroCounter == 1 &&nextByte == '\0' ) {
                     msgAsStr = popString();
                     zeroCounter++;
-                    return strToMsg(opCode, msgAsStr);
+                    Message curr = strToMsg(opCode, msgAsStr);
+                    resetValues();
+                    return curr;
                 }
                 if (nextByte == '\0') {
                     zeroCounter++;
@@ -49,28 +54,41 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             } else if (opCode == 8 || opCode == 12) {
                 if (nextByte=='\0') {
                     msgAsStr = popString();
-                    return strToMsg(opCode, msgAsStr);
+                    Message curr = strToMsg(opCode, msgAsStr);
+                    resetValues();
+                    return curr;
                 }
 
             } else if (opCode == 4 || opCode == 11) {
+                System.out.println("len: " + len);
                 if (len == 2) {
                     msgAsStr = popString();
-                    return strToMsg(opCode, msgAsStr);
+                    Message curr = strToMsg(opCode, msgAsStr);
+                    resetValues();
+                    return curr;
                 }
             } else if (opCode == 5 || opCode == 6 || opCode == 7 || opCode == 9 || opCode == 10 ) {
                 if (len == 4 ){
                     msgAsStr = popString();
-                    return strToMsg(opCode, msgAsStr);
+                    Message curr = strToMsg(opCode, msgAsStr);
+                    resetValues();
+                    return curr;
                 }
             }
 
         }
 
-        pushByte(nextByte);
         return null;
 
     }
 
+    public void resetValues(){
+        len = 0;
+        opCode = 0;
+        fullOpcode = 0;
+        zeroCounter = 0;
+        twoFirstBytes = new byte[2];
+    }
 
     public Message strToMsg(short opCode, String msg) {
         String userName = "";
@@ -101,7 +119,10 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             Message logOut = new LogOut(opCode);
             return logOut;
         } else if (opCode == 5 || opCode == 6 || opCode == 7 || opCode == 9 || opCode == 10) {
-            int courseNum = Integer.parseInt(msg.substring(2));
+            //int courseNum = Integer.parseInt(msg.substring(2))
+
+            short courseNum1 = bytesToShort( msg.substring(2).getBytes());
+            int courseNum = (short)courseNum1;
             switch (opCode) {
                 case 5:
                     Message courseReg = new CourseReg(opCode, courseNum);
@@ -147,26 +168,29 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         byte [] bytesToClient = null;
         byte [] opCodeArr;
         byte [] opCodeMsgArr;
+        System.out.println(message.getClass());
         if(message instanceof Ack){
+            System.out.println("ack sending");
             opCodeArr = shortToBytes(opCodeAck);
             opCodeMsg = (short)((message).getOpCode());
             opCodeMsgArr =  shortToBytes(opCodeMsg);
             bytesToClient = mergeBytes(opCodeArr, opCodeMsgArr);
-            if(opCode == 6){
+            if(opCodeMsg == 6){
                 string = string + ((Ack) message).getKdamCourses() + '\0';
                 bytesToClient = mergeBytes(bytesToClient, string.getBytes());
             }
-            if(opCode == 7 || opCode == 8 || opCode == 9){
+            if(opCodeMsg == 7 || opCodeMsg == 8 || opCodeMsg == 9){
                 string = string + ((Ack) message).getData() +'\0';
                 bytesToClient = mergeBytes(bytesToClient, string.getBytes());
 
             }
-            if(opCode==11){
+            if(opCodeMsg==11){
                 string = string + ((Ack) message).getStrMyCourses() +'\0';
                 bytesToClient = mergeBytes(bytesToClient, string.getBytes());
             }
         }
         else if(message instanceof Error){
+            System.out.println("err sending");
             opCodeArr = shortToBytes(opCodeErr);
             opCodeMsg =  (short)(( message).getOpCode());
             opCodeMsgArr =  shortToBytes(opCodeMsg);
