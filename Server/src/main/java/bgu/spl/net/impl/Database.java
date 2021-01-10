@@ -62,7 +62,6 @@ public class Database {
     public boolean initialize(String coursesFilePath) {
         try {
             FileReader file = new FileReader(coursesFilePath);
-            System.out.println(file+" file");
             BufferedReader in = new BufferedReader(file);
             String line = null;
             try {
@@ -199,9 +198,7 @@ public class Database {
         int opCode = 4;
         User user = findUser(userName);
         if (user != null) {
-            System.out.println("check in function: " + user.isLogIn());
             if (!user.isLogIn()){
-                System.out.println("enter186");
                 return new Error(opCode);
             }
             else {
@@ -209,7 +206,6 @@ public class Database {
                 return new Ack(opCode);
             }
         }
-        System.out.println("dataBase ok");
         return new Error(opCode);
     }
 
@@ -388,10 +384,7 @@ public class Database {
         Ack ack = new Ack(opCode);
 
         String string = "Student: " + userName + '\n' +  "Courses: " + courses;
-        System.out.println("ackData" + string);
-
         ack.setData(string);
-        System.out.println("ackData" + ack.getData());
         return ack;
     }
 

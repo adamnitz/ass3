@@ -38,8 +38,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         }
       /*else*/ if (fullOpcode == 2) {//TODO: CHECK IF DELETET THE ELSE DOESNT ROUING
             opCode = bytesToShort(twoFirstBytes);
-            System.out.println("server got opcode: " + opCode);
-//            System.out.println("len: " + len);
             if (opCode == 1 || opCode == 2 || opCode == 3) {
                 if (zeroCounter == 1 &&nextByte == '\0' ) {
                     msgAsStr = popString();
@@ -60,8 +58,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
                 }
 
             } else if (opCode == 4 || opCode == 11) {
-                System.out.println("len: " + len);
-                if (len == 2) {
+               if (len == 2) {
                     msgAsStr = popString();
                     Message curr = strToMsg(opCode, msgAsStr);
                     resetValues();
@@ -168,9 +165,7 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
         byte [] bytesToClient = null;
         byte [] opCodeArr;
         byte [] opCodeMsgArr;
-        System.out.println(message.getClass());
         if(message instanceof Ack){
-            System.out.println("ack sending");
             opCodeArr = shortToBytes(opCodeAck);
             opCodeMsg = (short)((message).getOpCode());
             opCodeMsgArr =  shortToBytes(opCodeMsg);
@@ -190,7 +185,6 @@ public class MessageEncoderDecoderImpl implements MessageEncoderDecoder<Message>
             }
         }
         else if(message instanceof Error){
-            System.out.println("err sending");
             opCodeArr = shortToBytes(opCodeErr);
             opCodeMsg =  (short)(( message).getOpCode());
             opCodeMsgArr =  shortToBytes(opCodeMsg);
