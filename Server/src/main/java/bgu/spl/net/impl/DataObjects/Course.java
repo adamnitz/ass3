@@ -60,6 +60,8 @@ public class Course {
     }
 
     public String getStringRegisteredStudent() {
+        registeredStudent.sort(Comparator.naturalOrder());
+
         String str ="[";
         for(int i=0; i<registeredStudent.size(); i++){
             str = str+registeredStudent.get(i)+",";

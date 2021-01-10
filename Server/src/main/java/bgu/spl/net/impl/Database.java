@@ -246,7 +246,7 @@ public class Database {
         if (student == null)
             return new Error(opCode);
 
-        if (kdamCheck(userName, courseNum, myUser) instanceof Error)
+        if (kdamCheck1(userName, courseNum, myUser) instanceof Error)
             return new Error(opCode);
 
         student.addCourse(course);
@@ -255,7 +255,32 @@ public class Database {
 
     }
 
-    public Message kdamCheck(String userName, int courseNumber,String myUser) {
+    public Message kdamCheck(String userName, int courseNumber,String myUser){
+        int opCode = 6 ;
+        if(myUser == null)
+            return new Error(opCode);
+        User user = findUser(myUser);
+        if(user instanceof Admin){
+            return new Error(opCode);
+        }
+        Student student = findStudent(userName);
+        Course course = findCourse(courseNumber);
+        if(course ==null)
+            return new Error(opCode);
+       LinkedList<Course> kdamCourseList = course.getKdamCourseList();
+       kdamCourseList=sortByCoursList(kdamCourseList);
+
+
+        Ack ack = new Ack(opCode);
+        ack.setKdamCourses(kdamCourseList);
+        return ack;
+
+
+    }
+
+
+
+    public Message kdamCheck1(String userName, int courseNumber,String myUser) {
         int opCode = 6;
         if(myUser == null)
             return new Error(opCode);
